@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Run a multi-line script
       run: |
         mkdir ../build
@@ -18,7 +18,7 @@ jobs:
         tar -cvf deploy.tar ../build/
 
     - name: copy file via ssh password
-      uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@v0.1.9
       with:
         host: ${{ secrets.DEPLOY_HOST }}
         username: ${{ secrets.DEPLOY_USER }}
