@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run a multi-line script
+      run: |
+        mkdir ../build
+        cp -TR . ../build
+        tar -cvf deploy.tar ../build/
+
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        password: ${{ secrets.DEPLOY_PASS }}
+        port: 22
+        source: "deploy.tar"
+        target: "/root/"
+      
+    - name: Run Docker CMD
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        password: ${{ secrets.DEPLOY_PASS }}
+        port: 22
+        script: |
+          rm -rf /root/perm300frontend
+          mkdir /root/perm300frontend
+          cd /root/perm300frontend
+          tar -xvf ../deploy.tar
+          cd /root/perm300frontend/build
+          docker build . --tag perm300frontend:latest
+          docker stop perm300frontend || true && docker rm perm300frontend || true
+          docker run -p 3088:3000 -d --name=perm300frontend --restart unless-stopped perm300frontend:latest
