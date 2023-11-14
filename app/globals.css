@@ -1,0 +1,14 @@
+/*@tailwind base;*/
+@tailwind components;
+@tailwind utilities;
+body {
+  margin: 0
+}
+
+.TabbarItem_TabbarItem__tappable__O4lyy {
+  position: absolute !important;
+  /**
+    косяк в работе vkui: в dev и build режиме пакеты собираются в разном порядке, а в вк указано в разных местах к одному элементу absolute и relative
+    правильно absolute, иначе Epic Tabbar съезжает
+  */
+}

@@ -1,0 +1,33 @@
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "next lint",
+    "start": "local-ssl-proxy --key perm300.key --cert perm300.crt --source 443 --target 3001 | next start -p 3001",
+    "startLoc": "next start",
+    "st": "local-ssl-proxy --key perm300.key --cert perm300.crt --source 443 --target 3001 | next dev -p 3001"
+  },
+  "dependencies": {
+    "@fontsource/unbounded": "^5.0.12",
+    "@pbe/react-yandex-maps": "^1.2.5",
+    "@react-three/drei": "^9.80.0",
+    "@react-three/fiber": "^8.13.6",
+    "@vkontakte/icons": "^2.69.0",
+    "@vkontakte/vk-bridge": "^2.11.2",
+    "@vkontakte/vkui": "^5.8.2",
+    "axios": "^1.4.0",
+    "eslint-config-next": "^13.5.6",
+    "local-ssl-proxy": "^2.0.5",
+    "next": "14.0.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "sharp": "^0.32.6",
+    "three": "^0.155.0",
+    "three-stdlib": "^2.23.13"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0"
+  }
+}
