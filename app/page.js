@@ -19,16 +19,18 @@ import {
 } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge';
 import {
-    Icon28Users,
+    Icon36Users,
 } from "@vkontakte/icons";
 import "@vkontakte/vkui/dist/cssm/styles/themes.css";
 
 //import '@vkontakte/vkui-tokens/themes/vkCom/cssVars/declarations/onlyVariables.css';
 //import '@vkontakte/vkui-tokens/themes/vkComDark/cssVars/declarations/onlyVariablesLocal.css';
 import Image from "next/image";
-import {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
+import {StyledBtn} from "@/components/StyledBtn";
+import {PanelHeaderBack} from "@vkontakte/vkui/src/components/PanelHeaderBack/PanelHeaderBack";
 
 
 
@@ -41,7 +43,7 @@ const ProfileInfo = () => {
         }).catch(e => console.log(e))
     })
     return <SimpleCell
-        before={<Avatar size={72} src={data?.photo_100 ? data.photo_100 : "#"} fallbackIcon={<Icon28Users />} />}
+        before={<Avatar size={72} src={data?.photo_100 ? data.photo_100 : "#"} fallbackIcon={<Icon36Users />} />}
         subtitle={data?.city?.title ? data?.city?.title : ""}
     >
         {data ? data.first_name + " " + data.last_name : "Загрузка..."}
@@ -70,9 +72,6 @@ const places = [
         geometry: [58.00816, 56.21635],
         name: "Театр-Театр"
     },
-
-]
-const quessPlaces = [
     {
         geometry: [58.01926, 56.27148],
         name: "Планетарий"
@@ -84,6 +83,53 @@ const quessPlaces = [
     {
         geometry: [58.01063, 56.23748],
         name: "Пермский медведь"
+    },
+]
+const quessPlaces = [
+    {
+        geometry: [58.01025, 56.22747],
+        name: "Эспланада",
+        src: "esplanada.jpg",
+    },
+    {
+        geometry: [58.00843, 56.21767],
+        name: "Театр-Театр",
+        src: "teatr.jpg",
+    },
+    {
+        geometry: [57.98248, 56.19747],
+        name: "Памятник Сухареву",
+        src: "suharev.jpg",
+    },
+    {
+        geometry: [57.98146, 56.19852],
+        name: "Дом наоборот",
+        src: "domnaoborot.jpg",
+    },
+    {
+        geometry: [57.99731, 56.17503],
+        name: "Сквер Кормшикова",
+        src: "skverKormshikova.jpg",
+    },
+    {
+        geometry: [57.97748,  56.18564],
+        name: "ДК Гагарина",
+        src: "dkGagarina.jpg",
+    },
+    {
+        geometry: [57.97201, 56.15355],
+        name: "ТЦ Планета",
+        src: "planeta.jpg",
+    },
+    {
+        geometry: [57.99056, 56.19372],
+        name: "Печатная фабрика Гознак",
+        src: "goznak.jpg",
+    },
+    {
+        geometry: [57.98626, 56.21665],
+        name: "ул. Стахановская",
+        src: "stahanovskaya.jpg",
     },
 ]
 const PlaceMarks = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}) => {
@@ -104,7 +150,7 @@ const PlaceMarks = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}
         {places.map((item,i) => <Placemark key={"plcmrk"+i} geometry={item.geometry}
          properties={{
              item: i,
-             balloonContentHeader: item.name,
+             balloonContentHeader: "Квест: "+item.name,
              balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openScene(${i});">
                 Открыть
             </button>`
@@ -116,13 +162,13 @@ const PlaceMarks = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}
         {quessPlaces.map((item,i) => <Placemark key={"plcmrQssk"+i} geometry={item.geometry}
            properties={{
                item: i,
-               balloonContentHeader: item.name,
-               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openScene(${i});">
-                Открыть
+               balloonContentHeader: "Угадано: "+item.name,
+               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="/*window.openScene(${i});*/">
+                Смотреть
             </button>`
            }}
            options={{
-               preset: "islands#redCircleDotIcon"
+               preset: "islands#darkGreenDotIcon"
            }}
         />)}
     </Clusterer>
@@ -158,6 +204,16 @@ const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen})
     </div>
 }
 
+const MyPresentsItem = ({name, photo, onCLick}) => {
+    return <div className="flex w-full shrink h-fit flex-col" onClick={onCLick}>
+        <div className="w-full h-[200px] rounded-[8px] relative overflow-hidden">
+            <Image style={{background: 'linear-gradient(0deg, #3A3A3A 0%, #3A3A3A 100%)', objectFit: "cover"}} fill sizes={"100vw"} src={photo} alt={name+photo}/>
+        </div>
+        <div className="relative text-[white] mt-1 text-[12px] font-unb" style={{
+            fontFeatureSettings: "'clig' off, 'liga' off",
+        }}>{name}</div>
+    </div>
+}
 
 const App = () => {
     const [openedScene,setOpenedScene] = useState(null)
@@ -176,6 +232,23 @@ const App = () => {
         bridge.send("VKWebAppInit")
     },[])
     const platform = usePlatform()
+    const [myPresents, setMyPresents] = useState(null)
+    const [openedPresent, setOpenedPresent] = useState(null)
+    const [myScore, setMyScore] = useState(0)
+    useEffect(() => {
+        setMyPresents([
+            {
+                name: "Скидка 3% на билет в театр-театр!",
+                photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+                description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
+            },
+            {
+                name: "Скидка 5% на покупку круиза из Перми на RiverBOOK",
+                photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg"
+            }
+        ])
+    },[])
+    console.log(myPresents)
     console.log(platform)
     return <AppRoot>
         <SplitLayout draggable={"false"}  header={<PanelHeader separator={false} />}>
@@ -263,10 +336,10 @@ const App = () => {
                         }}>
                             <FixedLayout vertical={"bottom"}>
                                 <div className="absolute -bottom-[7vh] left-0 relative w-full min-h-[738px] h-[107vh]">
-                                    <Image src={"/mainPhoto.jpeg"} fill sizes={"100vw"} style={{
+                                    <video src={"/medved.mp4"} className="w-full h-full" style={{
                                         objectFit: "cover",
                                         objectPosition: "top"
-                                    }} priority alt={"mainPhoto"}/>
+                                    }} priority playsInline muted loop autoPlay/>
                                 </div>
                                 <div className="h-[415px] absolute bottom-8 left-0" style={{width: '100%', opacity: 0.50, background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.40) 14%, black 100%)'}} />
                             </FixedLayout>
@@ -280,9 +353,33 @@ const App = () => {
                                 }}>Онлайн пространство,<br/>где всё реально!</h2>
                             </FixedLayout>
                             <FixedLayout vertical={"bottom"}>
-                                <h3 className="justify-center w-2/3 mb-40 text-[2.7vh] font-unb text-center font-medium text-[white] " style={{
+                                {/*<h3 className="justify-center w-2/3 mb-40 text-[2.7vh] font-unb text-center font-medium text-[white] " style={{
                                     textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
-                                }}>радик сюда надо медведя, который наша модель и город на фоне; можно 3сек видео чтобы рукой махал, <span className="text-[red]">щас картинка для примера</span></h3>
+                                }}>радик сюда надо медведя, который наша модель и город на фоне; можно 3сек видео чтобы рукой махал, <span className="text-[red]">щас картинка для примера</span></h3>*/}
+                                <StyledBtn onClick={() => setOpenedScreen("map")} className="text-[red] text-[20px]">Карта с квестами</StyledBtn>
+                                <StyledBtn onClick={() => setOpenedScreen("events")} className="text-[red] text-[20px]">Будущие события</StyledBtn>
+                                <StyledBtn onClick={() => setOpenedScreen("quessLocation")} className="text-[red] text-[20px] mb-2 relative">
+                                    <span>Узнай место в перми!</span>
+                                    <svg className="absolute -top-12 -right-12 h-[14vh] w-[calc(104_/_117_*_14vh)]" fill="none" viewBox="0 0 104 117">
+                                        <path
+                                            stroke="#F00"
+                                            strokeLinecap="round"
+                                            strokeWidth="2"
+                                            d="M32.688 34.805c28.22-24.044 44.439-23.345 50.66-16.043 6.22 7.3 7.798 45.55-39.913 90.265"
+                                        ></path>
+                                        <path
+                                            stroke="#F00"
+                                            strokeLinecap="round"
+                                            strokeWidth="2"
+                                            d="M45.184 96.973s-3.88 15.39-5.29 14.491c-1.408-.9 14.673-4.625 14.673-4.625"
+                                        ></path>
+                                    </svg>
+                                </StyledBtn>
+                                <div className="flex border-none font-medium font-unb py-2 w-[80vw] mx-auto justify-center text-center text-[12px] text-[#FFFFFF77] mb-14" style={{
+                                    //boxShadow: '0px 0px 16px #3A36FF',
+                                    textShadow: "0px 2px 8px rgba(255, 255, 255, 0.10)",
+                                    //background: "#030D1B66",
+                                }}>Собери достаточно баллов, чтобы присоединиться к онлайн событиям про Пермь и получить призы!</div>
                             </FixedLayout>
                             {/*<FixedLayout vertical={"bottom"}>
                                 <svg className="absolute -top-4 right-[47px] h-[14vh] w-[calc(104_/_117_*_14vh)]" fill="none" viewBox="0 0 104 117">
@@ -309,7 +406,9 @@ const App = () => {
                     </View>
                     <View id="map" activePanel="map">
                         <Panel id="map">
-                            <PanelHeader separator={false} /*transparent={true}*/>
+                            <PanelHeader separator={false} /*transparent={true}*/
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
                                 Карта
                             </PanelHeader>
                             {/*<FixedLayout style={{zIndex: "initial"}}>
@@ -317,11 +416,21 @@ const App = () => {
                             </FixedLayout>*/}
                             <Group>
                                 <FixedLayout vertical={"top"}>
-                                    <div className="mb-auto flex">
+                                    <div className="flex flex-col">
+                                        <div className="flex ml-2 mb-2">
+                                            <Image src={"/darkGreenDotIcon.png"} width="30" height="30" alt="darkGreenDotIcon" />
+                                            <span className="ml-1.5">- угаданные места</span>
+                                        </div>
+                                        <div className="flex ml-2 mb-2">
+                                            <Image src={"/redDotIcon.png"} width="30" height="30" alt="redDotIcon" />
+                                            <span className="ml-1.5">- места с квестами</span>
+                                        </div>
+                                    </div>
+                                    <div className=" flex">
                                         <YMaps query={{ lang: "ru_RU", load: "package.full" }}>
                                             <Map
                                                 width={"100vw"}
-                                                height={"75vh"}
+                                                height={"70vh"}
                                                 defaultState={{
                                                     center: [58.00819, 56.21612],
                                                     zoom: 12,
@@ -359,14 +468,90 @@ const App = () => {
                             </Group>
                         </Panel>
                     </View>
+                    <View id="events" activePanel="events">
+                        <Panel id="events">
+                            <PanelHeader separator={false} /*transparent={true}*/
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
+                                Будущие события
+                            </PanelHeader>
+                            <Group>
+
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="quessLocation" activePanel="quessLocation">
+                        <Panel id="quessLocation">
+                            <PanelHeader separator={false} /*transparent={true}*/
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
+                                Угадай, где это?
+                            </PanelHeader>
+                            <Group>
+                                <div className="flex w-40 h-40 bg-[#0f1011] justify-center items-center">
+                                    <h1 className="w-fit text-[32px] text-center font-unb font-medium text-[#F00] pt-1" style={{
+                                        //textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
+                                    }}>Пермь
+                                        <svg
+                                            className={"h-[4.3vh]  mt-[calc(2px_+_2vh)]"}
+                                            fill={"#F00"}
+                                            preserveAspectRatio="none"
+                                            viewBox="0 0 2222.5 1014.98"
+                                        >
+                                            <path
+                                                d="M405.99 608.99V304.91h-270.6V0h575.93L573.53 239.09c49.02 22.25 92.84 53.95 129.13 92.78C737.5 143.05 902.98 0 1101.88 0c154.4 0 288.66 86.19 357.32 213.09C1527.84 86.19 1662.11 0 1816.51 0c224.22 0 405.99 181.77 405.99 405.99s-181.77 405.99-405.99 405.99c-154.4 0-288.67-86.19-357.31-213.08-68.66 126.89-202.92 213.08-357.32 213.08-117.08 0-222.57-49.58-296.67-128.87-34.84 188.82-200.31 331.87-399.22 331.87C181.77 1014.98 0 833.21 0 608.99h405.99z"
+                                            ></path>
+                                        </svg>
+                                    </h1>
+                                </div>
+                                {JSON.stringify(quessPlaces.map(item => item.name))}
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="usePresent" activePanel="usePresent">
+                        <Panel id="usePresent">
+                            <PanelHeader separator={false} /*transparent={true}*/
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("present")}/*label="Назад"*/ />}
+                            >
+                                Использование акции/подарка
+                            </PanelHeader>
+                            <Group>
+                                <div className="text-center mt-10 mx-auto w-3/4">В этот момент якобы открывается сторонний ресурс</div>
+                                <StyledBtn onClick={() => setOpenedScreen("present")}>Вернутся</StyledBtn>
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="present" activePanel="present">
+                        <Panel id="present">
+                            <PanelHeader separator={false} /*transparent={true}*/
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("profile")}/*label="Назад"*/ />}
+                            >
+                                Подарок/акция
+                            </PanelHeader>
+                            {openedPresent !== null ? <Group>
+                                <div className="w-full h-[200px] relative">
+                                    <Image style={{background: 'linear-gradient(0deg, #3A3A3A 0%, #3A3A3A 100%)', objectFit: "cover"}} fill sizes={"100vw"} src={openedPresent.photo} alt={openedPresent.name}/>
+                                </div>
+                                <h2 className="text-[red] text-[16px] font-unb text-center m-0 pt-4 max-w-[90vw] mx-auto" style={{
+                                    textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
+                                }}>{openedPresent.name}</h2>
+                                <div className="text-[white] text-[14px] font-unb px-2.5 m-0 pt-4">{openedPresent?.description ? openedPresent?.description : "Описание отсутствует"}</div>
+                                <div className="mt-40"/>
+                                <StyledBtn onClick={() => {
+                                    setOpenedScreen("usePresent")
+                                }} className={"text-[red]  w-2/3"}>Использовать!</StyledBtn>
+                                <StyledBtn onClick={() => {
+                                    setOpenedScreen("profile")
+                                    setOpenedPresent(null)
+                                }} className={"text-[red]  w-2/3"}>Получить заново</StyledBtn>
+                            </Group> : <></>}
+                        </Panel>
+                    </View>
                     <View id="profile" activePanel="profile">
                         <Panel id="profile">
                             <PanelHeader fixed separator={false}>
                                 Профиль
                             </PanelHeader>
-                            {/*<FixedLayout style={{zIndex: "initial"}}>
-                                <div className="absolute -z-10 -top-[7vh] left-0 relative w-full h-[107vh] bg-[#2C2D2E]"/>
-                            </FixedLayout>*/}
                             <FixedLayout vertical="top" filled >
                                 <Spacing size={24}>
                                     <Separator />
@@ -378,12 +563,23 @@ const App = () => {
                                 <Text style={{
                                     fontSize: "20px",
                                     margin: "0 12px 12px 12px"
+                                }} className="text-[#E2E2E2] font-vk font-medium">Мои баллы: <span className="text-[red]">{myScore}</span></Text>
+                                <Text style={{
+                                    fontSize: "20px",
+                                    margin: "0 12px 12px 12px"
                                 }} className="text-[#E2E2E2] font-vk font-medium">Мои награды</Text>
                             </FixedLayout>
                             <Group>
-                                <div className="mt-[155px] grid grid-cols-2 gap-x-4 gap-y-[7px] px-2.5 py-4 pb-10">
-
-                                </div>
+                                {myPresents !== null ? <>
+                                    {myPresents.length > 0 ? <div className="mt-[175px] grid grid-cols-2 gap-x-4 gap-y-[7px] px-2.5 py-4 pb-10">
+                                            {myPresents.map((item,i) => <MyPresentsItem key={"prsnts"+item.name+i} name={item.name} onCLick={() => {
+                                                setOpenedPresent(item)
+                                                setOpenedScreen("present")
+                                            }} photo={item.photo}/>)}
+                                    </div> : <div className="mt-[195px] text-center w-full font-medium text-[18px]">
+                                        Пока что ты ничего не получил(<br/>Попробуй что-то <span className="text-[red]" onClick={() => setOpenedScreen("main")}>пройти!</span>
+                                    </div>}
+                                </> : <></>}
                             </Group>
                         </Panel>
                     </View>
