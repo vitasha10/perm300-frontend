@@ -27,12 +27,11 @@ import "@vkontakte/vkui/dist/cssm/styles/themes.css";
 //import '@vkontakte/vkui-tokens/themes/vkComDark/cssVars/declarations/onlyVariablesLocal.css';
 import Image from "next/image";
 import {useEffect, useState} from "react";
-import {useSearchParams} from "next/navigation";
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
 import {StyledBtn} from "@/components/StyledBtn";
 import {PanelHeaderBack} from "@vkontakte/vkui/src/components/PanelHeaderBack/PanelHeaderBack";
 
-
+export const apiUrl = "https://api.perm300.tech"
 
 const ProfileInfo = () => {
     const [data, setData] = useState(null)
@@ -65,6 +64,11 @@ const places = [
         src: "mpa"
     },
     {
+        geometry: [58.00516, 56.24928],
+        name: "Парк имени Горького",
+        src: "parkGorkogo"
+    },
+    {
         geometry: [58.01656, 56.23717],
         name: "Зоопарк"
     },
@@ -85,7 +89,7 @@ const places = [
         name: "Пермский медведь"
     },
 ]
-const quessPlaces = [
+export const quessPlaces = [
     {
         geometry: [58.01025, 56.22747],
         name: "Эспланада",
@@ -132,11 +136,15 @@ const quessPlaces = [
         src: "stahanovskaya.jpg",
     },
 ]
-const PlaceMarks = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}) => {
+const PlaceMarks = ({setOpenedScene, setOpenedQuessLocation, setOpenedScreen}) => {
     useEffect(() => {
         window.openScene = index => {
             setOpenedScreen("scene")
             setOpenedScene(index)
+        }
+        window.openQuessLocation = index => {
+            setOpenedScreen("quessLocation")
+            setOpenedQuessLocation(index)
         }
     },[])
     return <Clusterer
@@ -163,7 +171,7 @@ const PlaceMarks = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}
            properties={{
                item: i,
                balloonContentHeader: "Угадано: "+item.name,
-               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="/*window.openScene(${i});*/">
+               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openQuessLocation(${i});">
                 Смотреть
             </button>`
            }}
@@ -214,9 +222,63 @@ const MyPresentsItem = ({name, photo, onCLick}) => {
         }}>{name}</div>
     </div>
 }
+const QuessLocationPage = ({openedQuessLocation, setOpenedQuessLocation, setOpenedScreen}) => {
+    const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
+    const [loaded,setLoaded] = useState(false)
+    useEffect(() => {
+        const func = event => {
+            // IMPORTANT: check the origin of the data!
+            console.log(2424444,event)
+            if (event.origin.indexOf("perm300.tech") !== -1) {
+                // The data was sent from your site.
+                // Data sent with postMessage is stored in event.data:
+                if(event.data?.type == "closeScene") {
+                    setOpenedQuessLocation(null)
+                    setOpenedScreen("map")
+                }
+                if(event.data?.type == "loaded") {
+                    setLoaded(true)
+                }
+            } else {
+                // The data was NOT sent from your site!
+                // Be careful! Do not use it. This else branch is
+                // here just for clarity, you usually shouldn't need it.
+                return
+            }
+        }
+        window.addEventListener('message', func)
+        return () => {
+            window.removeEventListener("message", func)
+        }
+    },[])
+    return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
+        <iframe className={"w-full h-full border-none" + (loaded ? "" : " opacity-0")} src={"https://"+timestamp+".perm300.tech/levels/quessLocation?id="+openedQuessLocation}/>
+    </div>
+}
+
+const Logo = () => {
+    return <div className="flex w-40 h-40 bg-[#0f1011] justify-center items-center">
+        <h1 className="w-fit text-[32px] text-center font-unb font-medium text-[#F00] pt-1" style={{
+            //textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
+        }}>Пермь
+            <svg
+                className={"h-[4.3vh]  mt-[calc(2px_+_2vh)]"}
+                fill={"#F00"}
+                preserveAspectRatio="none"
+                viewBox="0 0 2222.5 1014.98"
+            >
+                <path
+                    d="M405.99 608.99V304.91h-270.6V0h575.93L573.53 239.09c49.02 22.25 92.84 53.95 129.13 92.78C737.5 143.05 902.98 0 1101.88 0c154.4 0 288.66 86.19 357.32 213.09C1527.84 86.19 1662.11 0 1816.51 0c224.22 0 405.99 181.77 405.99 405.99s-181.77 405.99-405.99 405.99c-154.4 0-288.67-86.19-357.31-213.08-68.66 126.89-202.92 213.08-357.32 213.08-117.08 0-222.57-49.58-296.67-128.87-34.84 188.82-200.31 331.87-399.22 331.87C181.77 1014.98 0 833.21 0 608.99h405.99z"
+                ></path>
+            </svg>
+        </h1>
+    </div>
+}
 
 const App = () => {
+    const [vkUserId, setVkUserId] = useState(null)
     const [openedScene,setOpenedScene] = useState(null)
+    const [openedQuessLocation,setOpenedQuessLocation] = useState(null)
     const { viewWidth } = useAdaptivityConditionalRender();
     const [openedScreen, setOpenedScreen] = useState("main")
     useEffect(() => {
@@ -230,8 +292,17 @@ const App = () => {
         document.head.appendChild(ell)
         bridge.subscribe((e) => console.log(e));
         bridge.send("VKWebAppInit")
+        bridge.send('VKWebAppGetLaunchParams')
+        .then((data) => {
+            if (data.vk_user_id) {
+                setVkUserId(data.vk_user_id)
+                console.log(data.vk_user_id)
+            }
+        })
+        .catch((error) => {
+            console.log("не вк",error);
+        });
     },[])
-    const platform = usePlatform()
     const [myPresents, setMyPresents] = useState(null)
     const [openedPresent, setOpenedPresent] = useState(null)
     const [myScore, setMyScore] = useState(0)
@@ -248,13 +319,11 @@ const App = () => {
             }
         ])
     },[])
-    console.log(myPresents)
-    console.log(platform)
     return <AppRoot>
         <SplitLayout draggable={"false"}  header={<PanelHeader separator={false} />}>
             <SplitCol width="100%" stretchedOnMobile autoSpaced>
                 <Epic activeStory={openedScreen}
-                      tabbar={openedScreen !== "scene" ?(
+                      tabbar={openedScreen !== "scene" ? (
                           viewWidth.tabletMinus && (
                               <div className="fixed bottom-0 left-0 pb-[7px] w-full h-[70px] bg-[#454647]">
                                   <Tabbar style={{ position: 'static', margin: '0 0 10px', background: "#454647"}}>
@@ -336,12 +405,13 @@ const App = () => {
                         }}>
                             <FixedLayout vertical={"bottom"}>
                                 <div className="absolute -bottom-[7vh] left-0 relative w-full min-h-[738px] h-[107vh]">
-                                    <video src={"/medved.mp4"} className="w-full h-full" style={{
+                                    <video src={"/medved2.mp4"} className="w-full h-full" style={{
                                         objectFit: "cover",
-                                        objectPosition: "top"
-                                    }} priority playsInline muted loop autoPlay/>
+                                        objectPosition: "center"
+                                    }} playsInline muted loop autoPlay/>
                                 </div>
-                                <div className="h-[415px] absolute bottom-8 left-0" style={{width: '100%', opacity: 0.50, background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.40) 14%, black 100%)'}} />
+                                <div className="h-[415px] absolute bottom-8 left-0"
+                                     style={{width: '100%', opacity: 0.50, background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.40) 14%, black 100%)'}} />
                             </FixedLayout>
                             <FixedLayout>
                                 <h1 className="flex mt-[14vh] justify-center w-full text-[5vh] font-unb font-medium text-[#F00] mb-0" style={{
@@ -418,16 +488,16 @@ const App = () => {
                                 <FixedLayout vertical={"top"}>
                                     <div className="flex flex-col">
                                         <div className="flex ml-2 mb-2">
-                                            <Image src={"/darkGreenDotIcon.png"} width="30" height="30" alt="darkGreenDotIcon" />
+                                            <Image src={"/darkGreenDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
                                             <span className="ml-1.5">- угаданные места</span>
                                         </div>
                                         <div className="flex ml-2 mb-2">
-                                            <Image src={"/redDotIcon.png"} width="30" height="30" alt="redDotIcon" />
+                                            <Image src={"/redDotIcon2.png"} width="30" height="30" alt="redDotIcon" />
                                             <span className="ml-1.5">- места с квестами</span>
                                         </div>
                                     </div>
-                                    <div className=" flex">
-                                        <YMaps query={{ lang: "ru_RU", load: "package.full" }}>
+                                    <div className="flex">
+                                        <YMaps query={{ lang: "ru_RU", load: "package.full", apikey: "81add0fa-3543-4b14-8d8a-60e97bcfa380" }} >
                                             <Map
                                                 width={"100vw"}
                                                 height={"70vh"}
@@ -448,9 +518,8 @@ const App = () => {
                                                 }}
                                             >
                                                 <PlaceMarks {...{
-                                                    openedScene,
                                                     setOpenedScene,
-                                                    openedScreen,
+                                                    setOpenedQuessLocation,
                                                     setOpenedScreen
                                                 }}/>
                                             </Map>
@@ -488,23 +557,7 @@ const App = () => {
                                 Угадай, где это?
                             </PanelHeader>
                             <Group>
-                                <div className="flex w-40 h-40 bg-[#0f1011] justify-center items-center">
-                                    <h1 className="w-fit text-[32px] text-center font-unb font-medium text-[#F00] pt-1" style={{
-                                        //textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
-                                    }}>Пермь
-                                        <svg
-                                            className={"h-[4.3vh]  mt-[calc(2px_+_2vh)]"}
-                                            fill={"#F00"}
-                                            preserveAspectRatio="none"
-                                            viewBox="0 0 2222.5 1014.98"
-                                        >
-                                            <path
-                                                d="M405.99 608.99V304.91h-270.6V0h575.93L573.53 239.09c49.02 22.25 92.84 53.95 129.13 92.78C737.5 143.05 902.98 0 1101.88 0c154.4 0 288.66 86.19 357.32 213.09C1527.84 86.19 1662.11 0 1816.51 0c224.22 0 405.99 181.77 405.99 405.99s-181.77 405.99-405.99 405.99c-154.4 0-288.67-86.19-357.31-213.08-68.66 126.89-202.92 213.08-357.32 213.08-117.08 0-222.57-49.58-296.67-128.87-34.84 188.82-200.31 331.87-399.22 331.87C181.77 1014.98 0 833.21 0 608.99h405.99z"
-                                            ></path>
-                                        </svg>
-                                    </h1>
-                                </div>
-                                {JSON.stringify(quessPlaces.map(item => item.name))}
+                                <QuessLocationPage {...{setOpenedQuessLocation, setOpenedScreen, openedQuessLocation}}/>
                             </Group>
                         </Panel>
                     </View>
@@ -563,7 +616,7 @@ const App = () => {
                                 <Text style={{
                                     fontSize: "20px",
                                     margin: "0 12px 12px 12px"
-                                }} className="text-[#E2E2E2] font-vk font-medium">Мои баллы: <span className="text-[red]">{myScore}</span></Text>
+                                }} className="text-[#E2E2E2] font-vk font-medium">Мои баллы за угаданные места: <span className="text-[red]">{myScore}/{quessPlaces.length}</span></Text>
                                 <Text style={{
                                     fontSize: "20px",
                                     margin: "0 12px 12px 12px"

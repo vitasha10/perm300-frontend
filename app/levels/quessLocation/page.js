@@ -4,10 +4,23 @@ import {useSearchParams} from "next/navigation";
 import {Canvas, useLoader, useThree} from "@react-three/fiber";
 import {Html, OrbitControls, useProgress} from "@react-three/drei";
 import {BackSide,TextureLoader} from "three"
-import {Suspense} from "react"
+import {Suspense, useEffect, useState} from "react"
+import {quessPlaces} from "@/app/page";
 
-const PhotoSphere = ({rotation,src}) => {
+const PhotoSphere = ({rotation,src,setTime}) => {
     const texture = useLoader(TextureLoader, src)
+    useEffect(() => {
+        if(!texture) return
+        window.parent.postMessage({"type": "loaded"}, "*")
+        const func = () => {
+            setTime(prev => {
+                if(prev === 15) return 15
+                return prev + 0.5
+            })
+        }
+        const intervalId = window.setInterval(func, 500)
+        return () => window.clearInterval(intervalId)
+    },[texture])
     return <group dispose={null}>
         <mesh position={[0,0,0]} rotation={[0,rotation,0]}>
             <sphereGeometry args={[256, 32, 32]} scale={[-1, 1, 1]}/>
@@ -27,15 +40,20 @@ const Loader = () => {
 
 export default function QuessLocation() {
     const searchParams = useSearchParams()
-    const location = "/dirt.jpg"//searchParams.get('location')
+    const data = quessPlaces[searchParams.get('id')]
+    const location = "https://data.vitasha.ru/perm300/panorams/"+data.src
+    const [time, setTime] = useState(0)
     const onEndd = () => {
         window.parent.postMessage({"type": "endVideo"}, "*")
         URL.revokeObjectURL(src)
     }
     return <div className="w-full h-screen flex flex-col overflow-hidden bg-[black]">
+        <div className="absolute z-10 top-20 left-10">
+            {time}
+        </div>
         <Canvas linear className="border-none">
-            <Suspense fallback={<Loader />}>
-                <PhotoSphere rotation={Math.PI/2} src={location}/>
+            <Suspense fallback={<Loader/>}>
+                <PhotoSphere rotation={Math.PI/2} src={location} setTime={setTime}/>
             </Suspense>
             {/*<Stats/>*/}
             <CameraControls/>
