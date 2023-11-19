@@ -13,7 +13,7 @@ const BasicScene = ({ children }) => {
                 {children}
                 <Floor rotation={[Math.PI / -2, 0, 0]} color="white" />
             </Physics>
-            <Stats/>
+            <Stats className="fixed top-[0px_!important] left-[100px_!important]"/>
         </Canvas>
         <Loader />
     </div>

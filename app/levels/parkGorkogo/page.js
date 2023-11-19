@@ -4,20 +4,25 @@ import Image from "next/image";
 import {useEffect, useState} from "react";
 import {StyledBtn} from "@/components/StyledBtn";
 import axios from "axios";
-import {apiUrl} from "@/app/page";
+import {apiUrl, useUserId} from "@/app/page";
 
 export default function LevParkGorkogo() {
     const [step, setStep] = useState(0)
     const [correct,setCorrect] = useState(0)
-    useEffect(() => {
-        if(correct === 5) {
-            axios.post(apiUrl+"/saveProgress",{
-                src: "parkGorkogo"
+    const vkId = useUserId()
+    const func = async (corr, name) => {
+        if(corr === 5) {
+            axios.post(apiUrl+"/addQuestRooms",{
+                userid: vkId,
+                data: name
             }).then(obj => console.log(obj)).catch(e => {
                 console.log(e)
                 alert("Ошибка сохранения результата")
             })
         }
+    }
+    useEffect(() => {
+        func(correct,"parkGorkogo").then(r => {})
     },[correct])
     return step === 0 ? <div className="bg-[#19191A] h-screen w-full">
         <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{

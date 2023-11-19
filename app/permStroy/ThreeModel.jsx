@@ -1,6 +1,6 @@
 import { useBox } from '@react-three/cannon'
 import {useGLTF, Sparkles, useTexture} from '@react-three/drei'
-import {useCallback, useRef, useState} from "react";
+import {useCallback, useState} from "react";
 import { create } from 'zustand'
 
 // This is a naive implementation and wouldn't allow for more than a few thousand boxes.
@@ -10,11 +10,15 @@ import { create } from 'zustand'
 const useCubeStore = create((set) => ({
     cubes: [],
     addCube: (x, y, z, m) => set((state) => ({ cubes: [...state.cubes, [x, y, z, m]] })),
+    removeCube: (x, y, z) => set((state) => {
+        console.log(state.cubes.filter(item => false === (item.x === x && item.y === y && item.z === z)) )
+        return state
+    }),
 }))
 
 export const Cubes = ({newM}) => {
     const cubes = useCubeStore((state) => state.cubes)
-    return cubes.map((coords, index) => <Cube key={index} position={[coords[0],coords[1],coords[2]]} m={coords[3]} newM={newM}/>)
+    return cubes.map((coords, index) => <Cube key={"bbcb"+coords[0]+"D"+coords[1]+"d"+coords[2]} position={[coords[0],coords[1],coords[2]]} m={coords[3]} newM={newM}/>)
 }
 
 
@@ -50,6 +54,7 @@ export function Cube(props) {
     }))
     const [hover, set] = useState(null)
     const addCube = useCubeStore((state) => state.addCube)
+    const removeCube = useCubeStore((state) => state.removeCube)
     const texture = useTexture(props.m)
     const onMove = useCallback((e) => {
         e.stopPropagation()
@@ -60,6 +65,10 @@ export function Cube(props) {
     return <mesh ref={ref} receiveShadow castShadow onPointerMove={onMove} onPointerOut={onOut} onClick={(e) => {
         e.stopPropagation()
         const {x, y, z} = ref.current.position
+        if(props.newM === -1) {
+            removeCube(x,y,z)
+            return
+        }
         const dir = [
             [x + 1, y, z,props.newM],
             [x - 1, y, z,props.newM],

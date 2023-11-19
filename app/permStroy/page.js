@@ -21,8 +21,10 @@ const keys = { Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5' }
 const keysWWW = { KeyW: 'forward', KeyS: 'backward', KeyA: 'left', KeyD: 'right', Space: 'jump' };
 const moveFieldByKey = (key) => keysWWW[key];
 const Cont = ({materials,currentMaterial,setCurrentMaterial,MoveBtn}) => {
-    return <div className="flex absolute bottom-10 left-10 w-fit h-fit z-10">
+    return <div className="flex absolute bottom-10 left-32 w-fit h-fit z-10">
         {materials.map((item,i) => <Image className="flex" width="40" height={currentMaterial === i ? "50" : "40"} src={"/"+item} key={"matt"+item+i} alt={item} onClick={() => setCurrentMaterial(i)}/>)}
+        <div className={(currentMaterial === -1 ? "h-[50px]" : "h-10") +` bg-[black] text-[white] w-10`}
+             onClick={() => setCurrentMaterial(-1)}>Убрать блок</div>
         <div className="flex flex-col w-[120px] h-[120px]">
             <div className="h-1/3 w-full flex items-center justify-center">
                 <MoveBtn where={"forward"}/>

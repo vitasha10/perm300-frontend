@@ -15,7 +15,7 @@ import {
     Group,
     SimpleCell,
     Tabbar, Epic,
-    TabbarItem, useAdaptivityConditionalRender, usePlatform
+    TabbarItem, useAdaptivityConditionalRender
 } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge';
 import {
@@ -23,13 +23,12 @@ import {
 } from "@vkontakte/icons";
 import "@vkontakte/vkui/dist/cssm/styles/themes.css";
 
-//import '@vkontakte/vkui-tokens/themes/vkCom/cssVars/declarations/onlyVariables.css';
-//import '@vkontakte/vkui-tokens/themes/vkComDark/cssVars/declarations/onlyVariablesLocal.css';
 import Image from "next/image";
 import {useEffect, useState} from "react";
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
 import {StyledBtn} from "@/components/StyledBtn";
 import {PanelHeaderBack} from "@vkontakte/vkui/src/components/PanelHeaderBack/PanelHeaderBack";
+import axios from "axios";
 
 export const apiUrl = "https://api.perm300.tech"
 
@@ -40,7 +39,7 @@ const ProfileInfo = () => {
             console.log(data)
             if (data.id) setData(data)
         }).catch(e => console.log(e))
-    })
+    },[])
     return <SimpleCell
         before={<Avatar size={72} src={data?.photo_100 ? data.photo_100 : "#"} fallbackIcon={<Icon36Users />} />}
         subtitle={data?.city?.title ? data?.city?.title : ""}
@@ -57,38 +56,81 @@ const ProfileInfo = () => {
         </div>
     </div>
 }
-const places = [
+
+export const places = [
     {
         geometry: [58.0357, 56.31005],
         name: "Музей пермской артиллерии",
-        src: "mpa"
+        src: "mpa",
+        present:  {
+            name: "Музей бонус",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "музей описание"
+        }
     },
     {
         geometry: [58.00516, 56.24928],
         name: "Парк имени Горького",
-        src: "parkGorkogo"
-    },
-    {
-        geometry: [58.01656, 56.23717],
-        name: "Зоопарк"
+        src: "parkGorkogo",
+        present:  {
+            name: "Парк имени Горького бонус",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "парк описание"
+        }
     },
     {
         geometry: [58.00816, 56.21635],
-        name: "Театр-Театр"
+        name: "Театр-Театр",
+        src: "teatr",
+        present:  {
+            name: "Скидка 3% на билет в театр-театр!",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
+        }
     },
     {
         geometry: [58.01926, 56.27148],
-        name: "Планетарий"
+        name: "Планетарий",
+        src: "planetariy",
+        present:  {
+            name: "Планет бонус",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "Планет описание"
+        }
     },
     {
         geometry: [58.02069, 56.25127],
-        name: "Теплоходы"
+        name: "Теплоходы",
+        src: "teplohodi",
+        present:  {
+            name: "Теплоходы бонус",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "Теплоходы описание"
+        }
+    },
+    /*{
+        geometry: [58.01063, 56.23748],
+        name: "Пермский медведь",
+        src: "mpa",
+        present:  {
+            name: "Скидка 3% на билет в театр-театр!",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
+        }
     },
     {
-        geometry: [58.01063, 56.23748],
-        name: "Пермский медведь"
+        geometry: [58.01656, 56.23717],
+        name: "Зоопарк",
+        src: "zoo",
+        present:  {
+            name: "Зоопарк бонус",
+            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            description: "зоопарк описание"
+        }
     },
+    */
 ]
+
 export const guessPlaces = [
     {
         geometry: [58.01025, 56.22747],
@@ -136,14 +178,24 @@ export const guessPlaces = [
         src: "stahanovskaya.jpg",
     },
 ]
-const PlaceMarks = ({setOpenedScene, setOpenedGuessLocation, setOpenedScreen}) => {
+
+export const nextEvents = [
+    {
+        name: "ПермьСтрой",
+        description: "Здравствуй, пермяк! А у нас тут событие намечается, много-много народу соберётся и будут они все строить! Строить диковинные Арт-Объекты в честь Пермь 300! Тут можно как смотреть, так и самому строить, присоединяйся!",
+        src: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+        href: "/permStroy"
+    }
+]
+
+const PlaceMarks = ({guessed, questRooms, setOpenedScene, setOpenedGuessLocation, setOpenedScreen}) => {
     useEffect(() => {
         window.openScene = index => {
             setOpenedScreen("scene")
             setOpenedScene(index)
         }
         window.openGuessLocation = index => {
-            setOpenedScreen("guessLocation")
+            setOpenedScreen("guessLocationJustSee")
             setOpenedGuessLocation(index)
         }
     },[])
@@ -155,11 +207,11 @@ const PlaceMarks = ({setOpenedScene, setOpenedGuessLocation, setOpenedScreen}) =
             //balloonPanelMaxMapArea: Infinity
         }}
     >
-        {places.map((item,i) => <Placemark key={"plcmrk"+i} geometry={item.geometry}
+        {places.filter(item => questRooms.indexOf(item.src) === -1).map(item => <Placemark key={"plcmrk"+item.name} geometry={item.geometry}
          properties={{
-             item: i,
+             item: places.findIndex(el => el.name === item.name),
              balloonContentHeader: "Квест: "+item.name,
-             balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openScene(${i});">
+             balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openScene(${places.findIndex(el => el.name === item.name)});">
                 Открыть
             </button>`
          }}
@@ -167,11 +219,11 @@ const PlaceMarks = ({setOpenedScene, setOpenedGuessLocation, setOpenedScreen}) =
                preset: "islands#redDotIcon"
            }}
         />)}
-        {guessPlaces.map((item,i) => <Placemark key={"plcmrQssk"+i} geometry={item.geometry}
+        {guessPlaces.filter(item => guessed.indexOf(item.src) !== -1).map(item=> <Placemark key={"plcmrQssk"+item.name} geometry={item.geometry}
            properties={{
-               item: i,
+               item: guessPlaces.findIndex(el => el.name === item.name),
                balloonContentHeader: "Угадано: "+item.name,
-               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openGuessLocation(${i});">
+               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openGuessLocation(${guessPlaces.findIndex(el => el.name === item.name)});">
                 Смотреть
             </button>`
            }}
@@ -187,7 +239,7 @@ const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen})
     useEffect(() => {
         const func = event => {
             // IMPORTANT: check the origin of the data!
-            console.log(2424444,event)
+            if(event === undefined) return
             if (event.origin.indexOf("perm300.tech") !== -1) {
                 // The data was sent from your site.
                 // Data sent with postMessage is stored in event.data:
@@ -212,6 +264,46 @@ const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen})
     </div>
 }
 
+const EventPage = ({eventData, setEventData, openedScreen, setOpenedScreen}) => {
+    const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
+    useEffect(() => {
+        const func = event => {
+            // IMPORTANT: check the origin of the data!
+            if(event.origin === undefined) return
+            if (event.origin.indexOf("perm300.tech") !== -1) {
+                // The data was sent from your site.
+                // Data sent with postMessage is stored in event.data:
+                if(event.data?.type == "closeEvent") {
+                    setEventData(null)
+                    setOpenedScreen("events")
+                }
+            } else {
+                // The data was NOT sent from your site!
+                // Be careful! Do not use it. This else branch is
+                // here just for clarity, you usually shouldn't need it.
+                return
+            }
+        }
+        window.addEventListener('message', func)
+        return () => {
+            window.removeEventListener("message", func)
+        }
+    },[])
+    return <div className="w-full h-[100vh] relative">
+        <div className="w-[100vh] h-[100vw] absolute  overflow-hidden" style={{
+            transform: "rotate(90deg)",
+            transformOrigin: "bottom right",
+            left: "-100vh",
+            top: "116vw"
+        }}>
+            <iframe className={"w-full h-full border-none"}
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    src={"https://"+timestamp+".perm300.tech"+nextEvents[eventData].href}/>
+        </div>
+    </div>
+}
+
 const MyPresentsItem = ({name, photo, onCLick}) => {
     return <div className="flex w-full shrink h-fit flex-col" onClick={onCLick}>
         <div className="w-full h-[200px] rounded-[8px] relative overflow-hidden">
@@ -222,21 +314,39 @@ const MyPresentsItem = ({name, photo, onCLick}) => {
         }}>{name}</div>
     </div>
 }
-const GuessLocationPage = ({openedGuessLocation, setOpenedGuessLocation, setOpenedScreen}) => {
+
+const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation, setOpenedScreen}) => {
+    const vkId = useUserId()
     const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
     const [loaded,setLoaded] = useState(false)
     useEffect(() => {
         const func = event => {
             // IMPORTANT: check the origin of the data!
-            console.log(2424444,event)
+            if(event === undefined) return
+            if(event.origin === undefined) return
             if (event.origin.indexOf("perm300.tech") !== -1) {
                 // The data was sent from your site.
                 // Data sent with postMessage is stored in event.data:
-                if(event.data?.type == "closeScene") {
-                    setOpenedGuessLocation(null)
-                    setOpenedScreen("map")
+                if(event.data?.type === "closeSuccess") {
+                    axios.post(apiUrl+"/addGuessedLocations",{
+                        userid: vkId,
+                        data: guessPlaces[openedGuessLocation].src
+                    }).then(obj => {
+                        setOpenedGuessLocation(null)
+                        setOpenedScreen("guessSuccess")
+                        console.log(obj)
+                    }).catch(e => {
+                        setOpenedGuessLocation(null)
+                        setOpenedScreen("guessSuccess")
+                        console.log(e)
+                        alert("Ошибка сохранения результата")
+                    })
                 }
-                if(event.data?.type == "loaded") {
+                if(event.data?.type === "closeBad") {
+                    setOpenedGuessLocation(null)
+                    setOpenedScreen("guessBad")
+                }
+                if(event.data?.type === "loaded") {
                     setLoaded(true)
                 }
             } else {
@@ -252,7 +362,10 @@ const GuessLocationPage = ({openedGuessLocation, setOpenedGuessLocation, setOpen
         }
     },[])
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
-        <iframe className={"w-full h-full border-none" + (loaded ? "" : " opacity-0")} src={"https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation}/>
+        {loaded ? <div className="top-40 w-full text-center absolute z-10">
+            Загрузка
+        </div> : <></>}
+        <iframe className={"w-full h-full border-none" + (loaded ? "" : " " /*opacity-0*/)} src={"https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")}/>
     </div>
 }
 
@@ -275,12 +388,93 @@ const Logo = () => {
     </div>
 }
 
-const App = () => {
+export const useUserId = () => {
     const [vkUserId, setVkUserId] = useState(null)
-    const [openedScene,setOpenedScene] = useState(null)
-    const [openedGuessLocation,setOpenedGuessLocation] = useState(null)
-    const { viewWidth } = useAdaptivityConditionalRender();
+    useEffect(() => {
+        bridge.send('VKWebAppGetUserInfo')
+        .then((data) => {
+            if (data.id) {
+                setVkUserId(data.id)
+            }
+        })
+        .catch((error) => {
+            console.log("не вк",error);
+        });
+    },[])
+    return vkUserId === null ? "419846599" : vkUserId
+}
+export const useQuestRooms = () => {
+    const [data, setData] = useState(null)
+    useEffect(() => {
+        let intervalId
+        const func = id => {
+            axios.get(apiUrl + "/getQuestRooms",{
+                params: {
+                    userid: id
+                }
+            }).then(obj => {
+                if(obj.data.rows !== data) setData(obj.data.rows)
+            }).catch(e => {
+                console.log(e)
+                alert("ошибка получения квестов")
+            })
+        }
+        intervalId = window.setInterval(() => func("419846599"), 3000)
+        /*bridge.send('VKWebAppGetUserInfo').then((data) => {
+            if (data.id) {
+                intervalId = window.setInterval(() => func(data.id), 3000)
+            }
+        }).catch((error) => {
+            console.log("не вк",error)
+        })*/
+        return () => window.clearInterval(intervalId)
+    },[undefined])
+    return data === null ? [] : data
+}
+export const useGuessedLocations = () => {
+    const [data, setData] = useState(null)
+    useEffect(() => {
+        console.log(239203999)
+
+        let intervalId
+        const func = id => {
+            axios.get(apiUrl+"/getGuessedLocations",{
+                params: {
+                    userid: id
+                }
+            }).then(obj => {
+                if(obj.data.rows !== data) setData(obj.data.rows)
+            }).catch(e => {
+                console.log(e)
+                alert("ошибка получения квестов")
+            })
+        }
+        intervalId = window.setInterval(() => func("419846599"), 3000)
+        /*console.log(bridge, 232233)
+        bridge.send('VKWebAppGetUserInfo').then((data) => {
+            console.log(2342555)
+            if (data.id) {
+                intervalId = window.setInterval(() => func(data.id), 3000)
+            }else{
+                alert("Error")
+            }
+        }).catch((error) => {
+            console.log("не вк",error)
+        })*/
+        return () => window.clearInterval(intervalId)
+    },[])
+    console.log(2223,data)
+    return data === null ? [] : data
+}
+const App = () => {
     const [openedScreen, setOpenedScreen] = useState("main")
+
+    const [openedScene,setOpenedScene] = useState(null)
+    const [eventData, setEventData] = useState(null)
+    const [openedGuessLocation,setOpenedGuessLocation] = useState(null)
+    const [openedPresent, setOpenedPresent] = useState(null)
+
+    const { viewWidth } = useAdaptivityConditionalRender();
     useEffect(() => {
         let nm = document.createAttribute("name")
         nm.value = "viewport"
@@ -290,40 +484,24 @@ const App = () => {
         ell.setAttributeNode(nm)
         ell.setAttributeNode(cntnt)
         document.head.appendChild(ell)
-        bridge.subscribe((e) => console.log(e));
-        bridge.send("VKWebAppInit")
-        bridge.send('VKWebAppGetLaunchParams')
-        .then((data) => {
-            if (data.vk_user_id) {
-                setVkUserId(data.vk_user_id)
-                console.log(data.vk_user_id)
-            }
-        })
-        .catch((error) => {
-            console.log("не вк",error);
-        });
     },[])
-    const [myPresents, setMyPresents] = useState(null)
-    const [openedPresent, setOpenedPresent] = useState(null)
-    const [myScore, setMyScore] = useState(0)
     useEffect(() => {
-        setMyPresents([
-            {
-                name: "Скидка 3% на билет в театр-театр!",
-                photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
-                description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
-            },
-            {
-                name: "Скидка 5% на покупку круиза из Перми на RiverBOOK",
-                photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg"
-            }
-        ])
+        bridge.send("VKWebAppInit")
     },[])
+    let questRooms = useQuestRooms()
+    let myPresents = places.filter(item => questRooms.indexOf(item.src) !== -1).map(item => item.present)
+    useEffect(() => {
+        myPresents = places.filter(item => questRooms.indexOf(item.src) !== -1).map(item => item.present)
+    },[questRooms])
+    let guessed = useGuessedLocations()
+    let locToGuess = guessPlaces.filter(item => guessed.indexOf(item.src) === -1)
+    let myScore = guessed.length
+    let vkId = useUserId()
     return <AppRoot>
         <SplitLayout draggable={"false"}  header={<PanelHeader separator={false} />}>
             <SplitCol width="100%" stretchedOnMobile autoSpaced>
                 <Epic activeStory={openedScreen}
-                      tabbar={openedScreen !== "scene" ? (
+                      tabbar={openedScreen !== "scene" && openedScreen !== "event" ? (
                           viewWidth.tabletMinus && (
                               <div className="fixed bottom-0 left-0 pb-[7px] w-full h-[70px] bg-[#454647]">
                                   <Tabbar style={{ position: 'static', margin: '0 0 10px', background: "#454647"}}>
@@ -423,12 +601,9 @@ const App = () => {
                                 }}>Онлайн пространство,<br/>где всё реально!</h2>
                             </FixedLayout>
                             <FixedLayout vertical={"bottom"}>
-                                {/*<h3 className="justify-center w-2/3 mb-40 text-[2.7vh] font-unb text-center font-medium text-[white] " style={{
-                                    textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
-                                }}>радик сюда надо медведя, который наша модель и город на фоне; можно 3сек видео чтобы рукой махал, <span className="text-[red]">щас картинка для примера</span></h3>*/}
                                 <StyledBtn onClick={() => setOpenedScreen("map")} className="text-[red] text-[20px]">Карта с квестами</StyledBtn>
                                 <StyledBtn onClick={() => setOpenedScreen("events")} className="text-[red] text-[20px]">Будущие события</StyledBtn>
-                                <StyledBtn onClick={() => setOpenedScreen("guessLocation")} className="text-[red] text-[20px] mb-2 relative">
+                                <StyledBtn onClick={() => setOpenedScreen("prevGuessLocation")} className="text-[red] text-[20px] mb-2 relative">
                                     <span>Узнай место в перми!</span>
                                     <svg className="absolute -top-12 -right-12 h-[14vh] w-[calc(104_/_117_*_14vh)]" fill="none" viewBox="0 0 104 117">
                                         <path
@@ -446,44 +621,18 @@ const App = () => {
                                     </svg>
                                 </StyledBtn>
                                 <div className="flex border-none font-medium font-unb py-2 w-[80vw] mx-auto justify-center text-center text-[12px] text-[#FFFFFF77] mb-14" style={{
-                                    //boxShadow: '0px 0px 16px #3A36FF',
                                     textShadow: "0px 2px 8px rgba(255, 255, 255, 0.10)",
-                                    //background: "#030D1B66",
                                 }}>Собери достаточно баллов, чтобы присоединиться к онлайн событиям про Пермь и получить призы!</div>
                             </FixedLayout>
-                            {/*<FixedLayout vertical={"bottom"}>
-                                <svg className="absolute -top-4 right-[47px] h-[14vh] w-[calc(104_/_117_*_14vh)]" fill="none" viewBox="0 0 104 117">
-                                    <path
-                                        stroke="#fff"
-                                        strokeLinecap="round"
-                                        strokeWidth="2"
-                                        d="M32.688 34.805c28.22-24.044 44.439-23.345 50.66-16.043 6.22 7.3 7.798 45.55-39.913 90.265"
-                                    ></path>
-                                    <path
-                                        stroke="#fff"
-                                        strokeLinecap="round"
-                                        strokeWidth="2"
-                                        d="M45.184 96.973s-3.88 15.39-5.29 14.491c-1.408-.9 14.673-4.625 14.673-4.625"
-                                    ></path>
-                                </svg>
-                                <h3 className="flex justify-center w-full text-[2.7vh] font-unb text-center font-medium text-[white] " style={{
-                                    textShadow: "0px 0px 10px rgba(255, 255, 255, 0.50)",
-                                }}>ВЫБЕРИ<br/>СВОЙ МИР</h3>
-
-                                <div className="h-[8vh]"/>
-                            </FixedLayout>*/}
                         </Panel>
                     </View>
                     <View id="map" activePanel="map">
                         <Panel id="map">
-                            <PanelHeader separator={false} /*transparent={true}*/
+                            <PanelHeader separator={false}
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
                             >
                                 Карта
                             </PanelHeader>
-                            {/*<FixedLayout style={{zIndex: "initial"}}>
-                                <div className="absolute -z-10 -top-[7vh] left-0 relative w-full h-[107vh] bg-[#2C2D2E]"/>
-                            </FixedLayout>*/}
                             <Group>
                                 <FixedLayout vertical={"top"}>
                                     <div className="flex flex-col">
@@ -497,7 +646,7 @@ const App = () => {
                                             <div className="rounded-[8px] bg-[#A5A5A5] pt-2 pl-2">
                                                 <Image src={"/redDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
                                             </div>
-                                            <span className="ml-1.5 mt-2">- места с квестами</span>
+                                            <span className="ml-1.5 mt-2">- оставшиеся квесты</span>
                                         </div>
                                     </div>
                                     <div className="flex">
@@ -511,7 +660,6 @@ const App = () => {
                                                     type: "yandex#hybrid",
                                                     controls: [
                                                         "zoomControl",
-
                                                     ],
                                                 }}
                                                 defaultOptions={{
@@ -522,6 +670,8 @@ const App = () => {
                                                 }}
                                             >
                                                 <PlaceMarks {...{
+                                                    guessed,
+                                                    questRooms,
                                                     setOpenedScene,
                                                     setOpenedGuessLocation,
                                                     setOpenedScreen
@@ -535,10 +685,22 @@ const App = () => {
                     </View>
                     <View id="scene" activePanel="scene">
                         <Panel id="scene">
-                            <PanelHeader separator={false} transparent={true}/>
+                            <PanelHeader separator={false} transparent={true}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("map")} />}
+                            />
                             <Group>
                                 <ScenePage {...{openedScene, setOpenedScene, openedScreen, setOpenedScreen}}/>
                             </Group>
+                        </Panel>
+                    </View>
+                    <View id="event" activePanel="event">
+                        <Panel id="event">
+                            <PanelHeader separator={false} transparent={true}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")} label="Выйти" />}
+                            />
+                            <FixedLayout>
+                                <EventPage {...{eventData, setEventData, openedScreen, setOpenedScreen}}/>
+                            </FixedLayout>
                         </Panel>
                     </View>
                     <View id="events" activePanel="events">
@@ -549,25 +711,131 @@ const App = () => {
                                 Будущие события
                             </PanelHeader>
                             <Group>
-
+                                <div>
+                                    {nextEvents.map((item, i) => <div key={"nxtvnts"+item.name} className="mx-2.5 mt-2.5 " onClick={() => {
+                                        setOpenedScreen("event")
+                                        setEventData(i)
+                                    }}>
+                                        <div className="h-[200px] relative rounded-[10px] overflow-hidden">
+                                            <div className="absolute z-10 top-2 left-2 text-[red] font-bold font-unb text-[24px]" style={{
+                                                textShadow: "0px 0px 8px rgba(255, 255, 255, 0.43)",
+                                            }}>{item.name}</div>
+                                            <Image src={item.src} alt={item.name} style={{
+                                                objectFit: "cover"
+                                            }} fill sizes={"100vw"}/>
+                                        </div>
+                                        <div className="text-[white] font-medium text-[14px] font-unb mt-1">{item.description}</div>
+                                    </div>)}
+                                </div>
                             </Group>
                         </Panel>
                     </View>
-                    <View id="guessLocation" activePanel="guessLocation">
-                        <Panel id="guessLocation">
-                            <PanelHeader separator={false} /*transparent={true}*/
+                    <View id="prevGuessLocation" activePanel="prevGuessLocation">
+                        <Panel id="prevGuessLocation">
+                            <PanelHeader separator={false}
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
                             >
                                 Угадай, где это?
                             </PanelHeader>
                             <Group>
-                                <GuessLocationPage {...{setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
+                                <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{
+                                    textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
+                                }}>Угадывать и получать бонусы это просто!</h2>
+                                <h3 className="text-[white] text-[14px] font-unb text-center w-[70vw] mt-20 mx-auto flex">
+                                    Правила мини-игры:<br/>
+                                    1. У тебя будет 15 секунд, чтобы вертеть панораму как только хочешь, ты должен понять, где она была сделана.<br/>
+                                    2. Через 15 секунд появится карта, на которой нужно будет выбрать правильную точку из трёх предложенных.<br/>
+                                    3. Если ты угадал, то точка покажется на общей карте!<br/><br/>
+                                    Угадай все, чтобы присоединиться к онлайн событию!
+                                </h3>
+                                <StyledBtn onClick={() => {
+                                    let rr = Math.round(Math.random() * 100) % locToGuess.length
+                                    let rrItem = locToGuess[rr]
+                                    let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
+                                    setOpenedGuessLocation(rrNormIndex)
+                                    console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
+                                    setOpenedScreen("guessLocation")
+                                }} className="text-[red]">Угадать случайное место!</StyledBtn>
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="guessSuccess" activePanel="guessSuccess">
+                        <Panel id="guessSuccess">
+                            <PanelHeader separator={false}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("prevGuessLocation")}/*label="Назад"*/ />}
+                            >
+                                Угадай, где это?
+                            </PanelHeader>
+                            <Group>
+                                <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{
+                                    textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
+                                }}>Ты угадал! Ура!</h2>
+                                <StyledBtn onClick={() => {
+                                    let rr = Math.round(Math.random() * 100) % locToGuess.length
+                                    let rrItem = locToGuess[rr]
+                                    let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
+                                    setOpenedGuessLocation(rrNormIndex)
+                                    console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
+                                    setOpenedScreen("guessLocation")
+                                }} className="text-[red]">Попробовать ещё!</StyledBtn>
+                                <StyledBtn onClick={() => {
+                                    setOpenedScreen("main")
+                                }} className="text-[red]">Выйти</StyledBtn>
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="guessBad" activePanel="guessBad">
+                        <Panel id="guessBad">
+                            <PanelHeader separator={false}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
+                                Угадай, где это?
+                            </PanelHeader>
+                            <Group>
+                                <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{
+                                    textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
+                                }}>Ты не угадал(</h2>
+                                <StyledBtn onClick={() => {
+                                    let rr = Math.round(Math.random() * 100) % locToGuess.length
+                                    let rrItem = locToGuess[rr]
+                                    let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
+                                    setOpenedGuessLocation(rrNormIndex)
+                                    console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
+                                    setOpenedScreen("guessLocation")
+                                }} className="text-[red]">Попробовать ещё!</StyledBtn>
+                                <StyledBtn onClick={() => {
+                                    setOpenedScreen("main")
+                                }} className="text-[red]">Выйти</StyledBtn>
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="guessLocation" activePanel="guessLocation">
+                        <Panel id="guessLocation">
+                            <PanelHeader separator={false}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
+                                Угадай, где это?
+                            </PanelHeader>
+                            <Group>
+                                <GuessLocationPage {...{justSee: false, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
+                            </Group>
+                        </Panel>
+                    </View>
+                    <View id="guessLocationJustSee" activePanel="guessLocationJustSee">
+                        <Panel id="guessLocationJustSee">
+                            <PanelHeader separator={false}
+                                         before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
+                            >
+                                Ты угадал это место
+                            </PanelHeader>
+                            <Group>
+                                <GuessLocationPage {...{justSee: true, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
                             </Group>
                         </Panel>
                     </View>
                     <View id="usePresent" activePanel="usePresent">
                         <Panel id="usePresent">
-                            <PanelHeader separator={false} /*transparent={true}*/
+                            <PanelHeader separator={false}
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("present")}/*label="Назад"*/ />}
                             >
                                 Использование акции/подарка
@@ -580,7 +848,7 @@ const App = () => {
                     </View>
                     <View id="present" activePanel="present">
                         <Panel id="present">
-                            <PanelHeader separator={false} /*transparent={true}*/
+                            <PanelHeader separator={false}
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("profile")}/*label="Назад"*/ />}
                             >
                                 Подарок/акция
@@ -598,6 +866,13 @@ const App = () => {
                                     setOpenedScreen("usePresent")
                                 }} className={"text-[red]  w-2/3"}>Использовать!</StyledBtn>
                                 <StyledBtn onClick={() => {
+                                    axios.post(apiUrl+"/removeQuestRooms",{
+                                        userid: vkId,
+                                        data: places.filter(item => item.present.name == openedPresent.name)[0].src
+                                    }).then(obj => console.log(obj)).catch(e => {
+                                        console.log(e)
+                                        alert("Ошибка сохранения результата")
+                                    })
                                     setOpenedScreen("profile")
                                     setOpenedPresent(null)
                                 }} className={"text-[red]  w-2/3"}>Получить заново</StyledBtn>
@@ -645,12 +920,6 @@ const App = () => {
         </SplitLayout>
     </AppRoot>
 }
-
-
-
-
-
-
 
 export default function FullApp() {
     return <ConfigProvider
