@@ -89,7 +89,7 @@ const places = [
         name: "Пермский медведь"
     },
 ]
-export const quessPlaces = [
+export const guessPlaces = [
     {
         geometry: [58.01025, 56.22747],
         name: "Эспланада",
@@ -136,15 +136,15 @@ export const quessPlaces = [
         src: "stahanovskaya.jpg",
     },
 ]
-const PlaceMarks = ({setOpenedScene, setOpenedQuessLocation, setOpenedScreen}) => {
+const PlaceMarks = ({setOpenedScene, setOpenedGuessLocation, setOpenedScreen}) => {
     useEffect(() => {
         window.openScene = index => {
             setOpenedScreen("scene")
             setOpenedScene(index)
         }
-        window.openQuessLocation = index => {
-            setOpenedScreen("quessLocation")
-            setOpenedQuessLocation(index)
+        window.openGuessLocation = index => {
+            setOpenedScreen("guessLocation")
+            setOpenedGuessLocation(index)
         }
     },[])
     return <Clusterer
@@ -167,11 +167,11 @@ const PlaceMarks = ({setOpenedScene, setOpenedQuessLocation, setOpenedScreen}) =
                preset: "islands#redDotIcon"
            }}
         />)}
-        {quessPlaces.map((item,i) => <Placemark key={"plcmrQssk"+i} geometry={item.geometry}
+        {guessPlaces.map((item,i) => <Placemark key={"plcmrQssk"+i} geometry={item.geometry}
            properties={{
                item: i,
                balloonContentHeader: "Угадано: "+item.name,
-               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openQuessLocation(${i});">
+               balloonContentBody: `<button class=" text-[white] font-bold text-[14px]" onclick="window.openGuessLocation(${i});">
                 Смотреть
             </button>`
            }}
@@ -222,7 +222,7 @@ const MyPresentsItem = ({name, photo, onCLick}) => {
         }}>{name}</div>
     </div>
 }
-const QuessLocationPage = ({openedQuessLocation, setOpenedQuessLocation, setOpenedScreen}) => {
+const GuessLocationPage = ({openedGuessLocation, setOpenedGuessLocation, setOpenedScreen}) => {
     const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
     const [loaded,setLoaded] = useState(false)
     useEffect(() => {
@@ -233,7 +233,7 @@ const QuessLocationPage = ({openedQuessLocation, setOpenedQuessLocation, setOpen
                 // The data was sent from your site.
                 // Data sent with postMessage is stored in event.data:
                 if(event.data?.type == "closeScene") {
-                    setOpenedQuessLocation(null)
+                    setOpenedGuessLocation(null)
                     setOpenedScreen("map")
                 }
                 if(event.data?.type == "loaded") {
@@ -252,7 +252,7 @@ const QuessLocationPage = ({openedQuessLocation, setOpenedQuessLocation, setOpen
         }
     },[])
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
-        <iframe className={"w-full h-full border-none" + (loaded ? "" : " opacity-0")} src={"https://"+timestamp+".perm300.tech/levels/quessLocation?id="+openedQuessLocation}/>
+        <iframe className={"w-full h-full border-none" + (loaded ? "" : " opacity-0")} src={"https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation}/>
     </div>
 }
 
@@ -278,7 +278,7 @@ const Logo = () => {
 const App = () => {
     const [vkUserId, setVkUserId] = useState(null)
     const [openedScene,setOpenedScene] = useState(null)
-    const [openedQuessLocation,setOpenedQuessLocation] = useState(null)
+    const [openedGuessLocation,setOpenedGuessLocation] = useState(null)
     const { viewWidth } = useAdaptivityConditionalRender();
     const [openedScreen, setOpenedScreen] = useState("main")
     useEffect(() => {
@@ -405,7 +405,7 @@ const App = () => {
                         }}>
                             <FixedLayout vertical={"bottom"}>
                                 <div className="absolute -bottom-[7vh] left-0 relative w-full min-h-[738px] h-[107vh]">
-                                    <video src={"/medved2.mp4"} className="w-full h-full" style={{
+                                    <video src={"/medved3.mp4"} className="w-full h-full" style={{
                                         objectFit: "cover",
                                         objectPosition: "center"
                                     }} playsInline muted loop autoPlay/>
@@ -428,7 +428,7 @@ const App = () => {
                                 }}>радик сюда надо медведя, который наша модель и город на фоне; можно 3сек видео чтобы рукой махал, <span className="text-[red]">щас картинка для примера</span></h3>*/}
                                 <StyledBtn onClick={() => setOpenedScreen("map")} className="text-[red] text-[20px]">Карта с квестами</StyledBtn>
                                 <StyledBtn onClick={() => setOpenedScreen("events")} className="text-[red] text-[20px]">Будущие события</StyledBtn>
-                                <StyledBtn onClick={() => setOpenedScreen("quessLocation")} className="text-[red] text-[20px] mb-2 relative">
+                                <StyledBtn onClick={() => setOpenedScreen("guessLocation")} className="text-[red] text-[20px] mb-2 relative">
                                     <span>Узнай место в перми!</span>
                                     <svg className="absolute -top-12 -right-12 h-[14vh] w-[calc(104_/_117_*_14vh)]" fill="none" viewBox="0 0 104 117">
                                         <path
@@ -488,19 +488,23 @@ const App = () => {
                                 <FixedLayout vertical={"top"}>
                                     <div className="flex flex-col">
                                         <div className="flex ml-2 mb-2">
-                                            <Image src={"/darkGreenDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
-                                            <span className="ml-1.5">- угаданные места</span>
+                                            <div className="rounded-[8px] bg-[#A5A5A5] pt-2 pl-2">
+                                                <Image src={"/darkGreenDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
+                                            </div>
+                                            <span className="ml-1.5 mt-2">- угаданные места</span>
                                         </div>
                                         <div className="flex ml-2 mb-2">
-                                            <Image src={"/redDotIcon2.png"} width="30" height="30" alt="redDotIcon" />
-                                            <span className="ml-1.5">- места с квестами</span>
+                                            <div className="rounded-[8px] bg-[#A5A5A5] pt-2 pl-2">
+                                                <Image src={"/redDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
+                                            </div>
+                                            <span className="ml-1.5 mt-2">- места с квестами</span>
                                         </div>
                                     </div>
                                     <div className="flex">
                                         <YMaps query={{ lang: "ru_RU", load: "package.full", apikey: "81add0fa-3543-4b14-8d8a-60e97bcfa380" }} >
                                             <Map
                                                 width={"100vw"}
-                                                height={"70vh"}
+                                                height={"68vh"}
                                                 defaultState={{
                                                     center: [58.00819, 56.21612],
                                                     zoom: 12,
@@ -519,7 +523,7 @@ const App = () => {
                                             >
                                                 <PlaceMarks {...{
                                                     setOpenedScene,
-                                                    setOpenedQuessLocation,
+                                                    setOpenedGuessLocation,
                                                     setOpenedScreen
                                                 }}/>
                                             </Map>
@@ -549,15 +553,15 @@ const App = () => {
                             </Group>
                         </Panel>
                     </View>
-                    <View id="quessLocation" activePanel="quessLocation">
-                        <Panel id="quessLocation">
+                    <View id="guessLocation" activePanel="guessLocation">
+                        <Panel id="guessLocation">
                             <PanelHeader separator={false} /*transparent={true}*/
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("main")}/*label="Назад"*/ />}
                             >
                                 Угадай, где это?
                             </PanelHeader>
                             <Group>
-                                <QuessLocationPage {...{setOpenedQuessLocation, setOpenedScreen, openedQuessLocation}}/>
+                                <GuessLocationPage {...{setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
                             </Group>
                         </Panel>
                     </View>
@@ -616,7 +620,7 @@ const App = () => {
                                 <Text style={{
                                     fontSize: "20px",
                                     margin: "0 12px 12px 12px"
-                                }} className="text-[#E2E2E2] font-vk font-medium">Мои баллы за угаданные места: <span className="text-[red]">{myScore}/{quessPlaces.length}</span></Text>
+                                }} className="text-[#E2E2E2] font-vk font-medium">Мои баллы за угаданные места: <span className="text-[red]">{myScore}/{guessPlaces.length}</span></Text>
                                 <Text style={{
                                     fontSize: "20px",
                                     margin: "0 12px 12px 12px"

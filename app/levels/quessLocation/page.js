@@ -5,7 +5,7 @@ import {Canvas, useLoader, useThree} from "@react-three/fiber";
 import {Html, OrbitControls, useProgress} from "@react-three/drei";
 import {BackSide,TextureLoader} from "three"
 import {Suspense, useEffect, useState} from "react"
-import {quessPlaces} from "@/app/page";
+import {guessPlaces} from "@/app/page";
 
 const PhotoSphere = ({rotation,src,setTime}) => {
     const texture = useLoader(TextureLoader, src)
@@ -38,9 +38,9 @@ const Loader = () => {
     return <Html center>{progress} % Загружено</Html>
 }
 
-export default function QuessLocation() {
+export default function GuessLocation() {
     const searchParams = useSearchParams()
-    const data = quessPlaces[searchParams.get('id')]
+    const data = guessPlaces[searchParams.get('id')]
     const location = "https://data.vitasha.ru/perm300/panorams/"+data.src
     const [time, setTime] = useState(0)
     const onEndd = () => {
