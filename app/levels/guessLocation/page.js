@@ -46,7 +46,7 @@ export default function GuessLocation() {
     const searchParams = useSearchParams()
     const data = guessPlaces[searchParams.get('id')]
     const justSee = searchParams.get('justsee') !== null
-    const location = "https://data.vitasha.ru/perm300/panorams/"+data.src
+    const location = "https://cdn.perm300.tech/perm300/panorams/"+data.src
     const [time, setTime] = useState(15)
     const [itog, setItog] = useState(null)
     const dots = [

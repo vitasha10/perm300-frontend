@@ -69,7 +69,7 @@ export const places = [
         src: "mpa",
         present:  {
             name: "Музей бонус",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "музей описание"
         }
     },
@@ -79,7 +79,7 @@ export const places = [
         src: "parkGorkogo",
         present:  {
             name: "Парк имени Горького бонус",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "парк описание"
         }
     },
@@ -89,7 +89,7 @@ export const places = [
         src: "teatr",
         present:  {
             name: "Скидка 3% на билет в театр-театр!",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
         }
     },*/
@@ -99,7 +99,7 @@ export const places = [
         src: "planetariy",
         present:  {
             name: "Планет бонус",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "Планет описание"
         }
     },
@@ -109,7 +109,7 @@ export const places = [
         src: "teplohodi",
         present:  {
             name: "Теплоходы бонус",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "Теплоходы описание"
         }
     },
@@ -119,7 +119,7 @@ export const places = [
         src: "mpa",
         present:  {
             name: "Скидка 3% на билет в театр-театр!",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "Пермский академический Театр-Театр – ведущее учреждение культуры Прикамья. Неоднократный обладатель самых престижных театральных премий, среди которых «Золотая маска». \n"
         }
     },
@@ -129,7 +129,7 @@ export const places = [
         src: "zoo",
         present:  {
             name: "Зоопарк бонус",
-            photo: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+            photo: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
             description: "зоопарк описание"
         }
     },
@@ -221,7 +221,7 @@ export const nextEvents = [
     {
         name: "ПермьСтрой",
         description: "Здравствуй, пермяк! А у нас тут событие намечается, много-много народу соберётся и будут они все строить! Строить диковинные Арт-Объекты в честь Пермь 300! Тут можно как смотреть, так и самому строить, присоединяйся!",
-        src: "https://data.vitasha.ru/perm300/bonus-teatr-teatr.jpg",
+        src: "https://cdn.perm300.tech/perm300/bonus-teatr-teatr.jpg",
         href: "/permStroy"
     }
 ]
@@ -356,7 +356,7 @@ const MyPresentsItem = ({name, photo, onCLick}) => {
 const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation, setOpenedScreen,vkId}) => {
     const [loaded,setLoaded] = useState(false)
     const data = guessPlaces[openedGuessLocation]
-    const location = "https://data.vitasha.ru/perm300/panorams/"+data.src
+    const location = "https://cdn.perm300.tech/perm300/panorams/"+data.src
     const [time, setTime] = useState(15.5)
     const [itog, setItog] = useState(null)
     const dots = [
