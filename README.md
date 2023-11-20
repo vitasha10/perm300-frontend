@@ -1,6 +1,8 @@
 # Пожалуйста, прочитайте весь этот файл!
 
-<img height="300" src="/preview.mp4"/>
+https://github.com/vitasha10/perm300-frontend/assets/45239133/8b3f68b8-dddd-4b9d-9cf8-cb76da00582f
+
+[Видео](https://raw.githubusercontent.com/vitasha10/perm300-frontend/main/preview.mp4)
 
 ## Наша игра называется - «Пермь300 - игровое пространство»
 
