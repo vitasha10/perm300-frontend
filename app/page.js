@@ -322,6 +322,7 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
     useEffect(() => {
         const func = event => {
             // IMPORTANT: check the origin of the data!
+            console.log(78787, event)
             if(event === undefined) return
             if(event.origin === undefined) return
             if (event.origin.indexOf("perm300.tech") !== -1) {
