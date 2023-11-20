@@ -363,7 +363,7 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
             window.removeEventListener("message", func)
         }
     },[])
-    let hhref = "https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":""
+    let hhref = "https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")
     console.log(88908, hhref)                                                                                  
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
         {!loaded ? <div className="top-40 w-full text-center absolute z-10">
