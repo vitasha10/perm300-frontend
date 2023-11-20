@@ -298,8 +298,7 @@ const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen,v
         }
     },[])
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
-        <div className="absolute left-40 top-40 z-100">{"https://"+timestamp+".perm300.tech/levels/"+places[openedScene].src+"&vk_user_id="+vkId}</div>
-        <iframe className={"w-full h-full border-none"} src={"https://"+timestamp+".perm300.tech/levels/"+places[openedScene].src+"&vk_user_id="+vkId}/>
+        <iframe className={"w-full h-full border-none"} src={"https://"+timestamp+".perm300.tech/levels/"+places[openedScene].src+"?vk_user_id="+vkId}/>
     </div>
 }
 
@@ -338,7 +337,7 @@ const EventPage = ({eventData, setEventData, openedScreen, setOpenedScreen,vkId}
             <iframe className={"w-full h-full border-none"}
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    src={"https://"+timestamp+".perm300.tech"+nextEvents[eventData].href+"&vk_user_id="+vkId}/>
+                    src={"https://"+timestamp+".perm300.tech"+nextEvents[eventData].href+"?vk_user_id="+vkId}/>
         </div>
     </div>
 }
