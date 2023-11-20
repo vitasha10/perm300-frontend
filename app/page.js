@@ -320,7 +320,9 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
     const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
     const [loaded,setLoaded] = useState(false)
     useEffect(() => {
+        console.log(90825)
         const func = event => {
+            console.log(91249,event)
             // IMPORTANT: check the origin of the data!
             console.log(78787, event)
             if(event === undefined) return
@@ -362,11 +364,13 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
             window.removeEventListener("message", func)
         }
     },[])
+    let hhref = "https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")
+    console.log(88908, hhref)                                                                                  
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
         {!loaded ? <div className="top-40 w-full text-center absolute z-10">
             Загрузка
         </div> : <></>}
-        <iframe className={"w-full h-full border-none" + (loaded ? "" : " " /*opacity-0*/)} src={"https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")}/>
+        <iframe className={"bg-[green] w-full h-screen border-none" + (loaded ? "" : " " /*opacity-0*/)} src={hhref}/>
     </div>
 }
 
