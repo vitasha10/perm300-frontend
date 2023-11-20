@@ -24,7 +24,7 @@ import {
 import "@vkontakte/vkui/dist/cssm/styles/themes.css";
 
 import Image from "next/image";
-import {Suspense, useEffect, useState} from "react"
+import {Suspense, useCallback, useEffect, useMemo, useState} from "react"
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
 import {StyledBtn} from "@/components/StyledBtn";
 import {PanelHeaderBack} from "@vkontakte/vkui/src/components/PanelHeaderBack/PanelHeaderBack";
@@ -493,11 +493,14 @@ const Logo = () => {
 }
 
 export const useUserId = () => {
+    const search = useSearchParams()
+    const idUrl = search.get("vk_user_id")
     const [vkUserId, setVkUserId] = useState(null)
     useEffect(() => {
         if(vkUserId !== null) return
         bridge.send('VKWebAppGetUserInfo')
         .then((data) => {
+            console.log("vkgetid",data,idUrl)
             if (data.id) {
                 setVkUserId(data.id)
             }
@@ -506,7 +509,7 @@ export const useUserId = () => {
             console.log("не вк",error);
         });
     },[])
-    return vkUserId === null ? "419846599" : vkUserId
+    return vkUserId === null ? idUrl : vkUserId
 }
 
 const App = () => {
