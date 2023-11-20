@@ -41,101 +41,101 @@ export default function CirkPage() {
             textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
         }}>Первый вопрос:</h2>
         <h3 className="text-[white] text-[18px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-20">
-            На территории парка располагается Пермская ротонда. Кто был её архитектором?
+            В какое время состоялось первое цирковое представление в Перми?
         </h3>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Вячеслав Уральский</StyledBtn>
+        }} className="text-[white] text-[14px]">начало 20 века</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Мендель Футрик</StyledBtn>
+        }} className="text-[white] text-[14px]">начало 19 века</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
             setCorrect(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Иван Свиязев</StyledBtn>
+        }} className="text-[white] text-[14px]">конец 19 века</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Иван Турчевич</StyledBtn>
+        }} className="text-[white] text-[14px]">конец 18 века</StyledBtn>
     </div> : step === 2 ? <div className="bg-[#19191A] h-screen w-full">
         <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-20" style={{
             textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
         }}>Второй вопрос:</h2>
-        <h3 className="text-[white] text-[18px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-4">
-            В городском саду не раз побывал великий князь Михаил Александрович Романов. В какое время это могло происходить?
+        <h3 className="text-[white] text-[18px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-20">
+            Как сейчас зовут руководителя цирка?
         </h3>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
             setCorrect(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Начало 20 века</StyledBtn>
+        }} className="text-[white] text-[14px]">Анна Грибова</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">19 век</StyledBtn>
+        }} className="text-[white] text-[14px]">Стефанов Сергей</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Конец 20 века</StyledBtn>
+        }} className="text-[white] text-[14px]">Разом Алиев</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">18 век</StyledBtn>
+        }} className="text-[white] text-[14px]">Сумишевская Мария</StyledBtn>
     </div> : step === 3 ? <div className="bg-[#19191A] h-screen w-full">
         <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-20" style={{
             textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
         }}>Третий вопрос:</h2>
         <h3 className="text-[white] text-[18px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-20">
-            Какого бренд-персонажа нет в парке?
+            Когда отмечаетая Всемирный день цирка?
         </h3>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Пони Карамелька</StyledBtn>
+        }} className="text-[white] text-[14px]">первый понедельник июля</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Паркуша</StyledBtn>
+        }} className="text-[white] text-[14px]">вторая суббота марта</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Пёсик Дик</StyledBtn>
+        }} className="text-[white] text-[14px]">первое воскресенье февраля</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
             setCorrect(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Белочка Ириска</StyledBtn>
+        }} className="text-[white] text-[14px]">третья суббота апреля</StyledBtn>
     </div> : step === 4 ? <div className="bg-[#19191A] h-screen w-full">
         <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-20" style={{
             textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
         }}>Четвёртый вопрос:</h2>
         <h3 className="text-[white] text-[18px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-20">
-            Какой памятник стоит на территории парка?
+            Какой адрес Перского государственного цирка?
         </h3>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
             setCorrect(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Памятник бездомному коту</StyledBtn>
+        }} className="text-[white] text-[14px]">ул. Уральская, 112</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Памятник больной собаке</StyledBtn>
+        }} className="text-[white] text-[14px]">ул. Крупской, 12</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Памятник оставленным животным</StyledBtn>
+        }} className="text-[white] text-[14px]">ул. Лебедева, 46</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">Памятник бездомной собаке</StyledBtn>
+        }} className="text-[white] text-[14px]">бульвар Гагарина, 36</StyledBtn>
     </div> : step === 5 ? <div className="bg-[#19191A] h-screen w-full">
         <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-20" style={{
             textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
         }}>Пятый вопрос:</h2>
         <h3 className="text-[white] text-[16px] font-unb text-center w-[70vw] mt-4 mx-auto flex mb-20">
-            Сколько лет парку исполнилось в 2023 году?
+            Какое животное никогда не выступало на арене Пермского цирка?
         </h3>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">100</StyledBtn>
+        }} className="text-[white] text-[14px]">слон</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
             setCorrect(prev => prev + 1)
-        }} className="text-[white] text-[14px]">95</StyledBtn>
+        }} className="text-[white] text-[14px]">снежный барс</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">75</StyledBtn>
+        }} className="text-[white] text-[14px]">жираф</StyledBtn>
         <StyledBtn onClick={() => {
             setStep(prev => prev + 1)
-        }} className="text-[white] text-[14px]">110</StyledBtn>
+        }} className="text-[white] text-[14px]">бегемот</StyledBtn>
     </div> : <div className="bg-[#19191A] h-screen w-full">
         {correct === 5 ? <>
             <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-20" style={{
