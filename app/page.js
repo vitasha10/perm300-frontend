@@ -362,7 +362,7 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
         }
     },[])
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
-        {loaded ? <div className="top-40 w-full text-center absolute z-10">
+        {!loaded ? <div className="top-40 w-full text-center absolute z-10">
             Загрузка
         </div> : <></>}
         <iframe className={"w-full h-full border-none" + (loaded ? "" : " " /*opacity-0*/)} src={"https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")}/>
@@ -405,8 +405,23 @@ export const useUserId = () => {
 }
 export const useQuestRooms = () => {
     const [data, setData] = useState(null)
+    const [data2, setData2] = useState(null)
     useEffect(() => {
         let intervalId
+        let intervalId2
+        const func2 = id => {
+            axios.get(apiUrl+"/getGuessedLocations",{
+                params: {
+                    userid: id
+                }
+            }).then(obj => {
+                if(obj.data.rows !== data) setData2(obj.data.rows)
+            }).catch(e => {
+                console.log(e)
+                alert("ошибка получения квестов")
+            })
+        }
+
         const func = id => {
             axios.get(apiUrl + "/getQuestRooms",{
                 params: {
@@ -419,19 +434,22 @@ export const useQuestRooms = () => {
                 alert("ошибка получения квестов")
             })
         }
-        intervalId = window.setInterval(() => func("419846599"), 3000)
-        /*bridge.send('VKWebAppGetUserInfo').then((data) => {
+        //intervalId = window.setInterval(() => func("419846599"), 3000)
+        bridge.send('VKWebAppGetUserInfo').then((data) => {
             if (data.id) {
-                intervalId = window.setInterval(() => func(data.id), 3000)
+                intervalId = window.setInterval(() => func(data.id), 1000)
+                intervalId2 = window.setInterval(() => func2(data.id), 1000)
             }
         }).catch((error) => {
             console.log("не вк",error)
-        })*/
+        })
         return () => window.clearInterval(intervalId)
-    },[undefined])
-    return data === null ? [] : data
+    },[])
+    let final1 = data === null ? [] : data
+    let final2 = data2 === null ? [] : data2
+    return [final1,final2]
 }
-export const useGuessedLocations = () => {
+/*export const useGuessedLocations = () => {
     const [data, setData] = useState(null)
     useEffect(() => {
         console.log(239203999)
@@ -449,23 +467,23 @@ export const useGuessedLocations = () => {
                 alert("ошибка получения квестов")
             })
         }
-        intervalId = window.setInterval(() => func("419846599"), 3000)
-        /*console.log(bridge, 232233)
+        //intervalId = window.setInterval(() => func("419846599"), 3000)
+        console.log(bridge, 232233)
         bridge.send('VKWebAppGetUserInfo').then((data) => {
             console.log(2342555)
-            if (data.id) {
-                intervalId = window.setInterval(() => func(data.id), 3000)
+            if (data.vk_user_id) {
+                intervalId = window.setInterval(() => func(data.id), 1000)
             }else{
                 alert("Error")
             }
         }).catch((error) => {
             console.log("не вк",error)
-        })*/
+        })
         return () => window.clearInterval(intervalId)
     },[])
     console.log(2223,data)
     return data === null ? [] : data
-}
+}*/
 const App = () => {
     const [openedScreen, setOpenedScreen] = useState("main")
 
@@ -473,6 +491,58 @@ const App = () => {
     const [eventData, setEventData] = useState(null)
     const [openedGuessLocation,setOpenedGuessLocation] = useState(null)
     const [openedPresent, setOpenedPresent] = useState(null)
+
+
+    let vkId = useUserId()
+    const [data, setData] = useState(null)
+    const [data2, setData2] = useState(null)
+    useEffect(() => {
+        console.log(1133,vkId)
+        if(!vkId) return
+        let intervalId
+        let intervalId2
+        const func2 = id => {
+            axios.get(apiUrl+"/getGuessedLocations",{
+                params: {
+                    userid: id
+                }
+            }).then(obj => {
+                if(obj.data.rows !== data) setData2(obj.data.rows)
+            }).catch(e => {
+                console.log(e)
+                alert("ошибка получения квестов")
+            })
+        }
+
+        const func = id => {
+            axios.get(apiUrl + "/getQuestRooms",{
+                params: {
+                    userid: id
+                }
+            }).then(obj => {
+                if(obj.data.rows !== data) setData(obj.data.rows)
+            }).catch(e => {
+                console.log(e)
+                alert("ошибка получения квестов")
+            })
+        }
+        intervalId = window.setInterval(() => func(vkId), 1000)
+        intervalId2 = window.setInterval(() => func2(vkId), 1000)
+        //intervalId = window.setInterval(() => func("419846599"), 3000)
+        /*bridge.send('VKWebAppGetUserInfo').then((data) => {
+            if (data.id) {
+                }
+        }).catch((error) => {
+            console.log("не вк",error)
+        })*/
+        return () => window.clearInterval(intervalId)
+    },[vkId])
+    let final1 = data === null ? [] : data
+    let final2 = data2 === null ? [] : data2
+    let [questRooms, guessed] = [final1, final2]
+    console.log(questRooms, guessed)
+
+
 
     const { viewWidth } = useAdaptivityConditionalRender();
     useEffect(() => {
@@ -487,16 +557,15 @@ const App = () => {
     },[])
     useEffect(() => {
         bridge.send("VKWebAppInit")
+        bridge.subscribe(e => console.log(e))
     },[])
-    let questRooms = useQuestRooms()
+
     let myPresents = places.filter(item => questRooms.indexOf(item.src) !== -1).map(item => item.present)
     useEffect(() => {
         myPresents = places.filter(item => questRooms.indexOf(item.src) !== -1).map(item => item.present)
     },[questRooms])
-    let guessed = useGuessedLocations()
     let locToGuess = guessPlaces.filter(item => guessed.indexOf(item.src) === -1)
     let myScore = guessed.length
-    let vkId = useUserId()
     return <AppRoot>
         <SplitLayout draggable={"false"}  header={<PanelHeader separator={false} />}>
             <SplitCol width="100%" stretchedOnMobile autoSpaced>
