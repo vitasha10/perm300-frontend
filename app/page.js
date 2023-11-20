@@ -865,14 +865,14 @@ const App = () => {
                                 <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{
                                     textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
                                 }}>Ты угадал! Ура!</h2>
-                                <StyledBtn onClick={() => {
+                                {myScore === guessPlaces.length ? <div>Поздравляем! Вы всё угадали!</div> : <StyledBtn onClick={() => {
                                     let rr = Math.round(Math.random() * 100) % locToGuess.length
                                     let rrItem = locToGuess[rr]
                                     let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
                                     setOpenedGuessLocation(rrNormIndex)
                                     console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
                                     setOpenedScreen("guessLocation")
-                                }} className="text-[red]">Попробовать ещё!</StyledBtn>
+                                }} className="text-[red]">Угадать случайное место!</StyledBtn>}
                                 <StyledBtn onClick={() => {
                                     setOpenedScreen("main")
                                 }} className="text-[red]">Выйти</StyledBtn>
@@ -890,14 +890,19 @@ const App = () => {
                                 <h2 className="text-[red] text-[28px] font-unb text-center m-0 pt-10" style={{
                                     textShadow: "0px 0px 8px rgba(255, 255, 255, 0.13)",
                                 }}>Ты не угадал(</h2>
-                                <StyledBtn onClick={() => {
-                                    let rr = Math.round(Math.random() * 100) % locToGuess.length
+                                {myScore === guessPlaces.length ? <div>Поздравляем! Вы всё угадали!</div> : <StyledBtn onClick={() => {
+                                    let rr
+                                    if(locToGuess.length - 1 === 0) {
+                                        rr = 0
+                                    }else {
+                                        rr = Math.round(Math.random() * 100) % (locToGuess.length - 1)
+                                    }
                                     let rrItem = locToGuess[rr]
                                     let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
                                     setOpenedGuessLocation(rrNormIndex)
                                     console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
                                     setOpenedScreen("guessLocation")
-                                }} className="text-[red]">Попробовать ещё!</StyledBtn>
+                                }} className="text-[red]">Угадать случайное место!</StyledBtn>}
                                 <StyledBtn onClick={() => {
                                     setOpenedScreen("main")
                                 }} className="text-[red]">Выйти</StyledBtn>
