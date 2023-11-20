@@ -842,14 +842,15 @@ const App = () => {
                                     3. Если ты угадал, то точка покажется на общей карте!<br/><br/>
                                     Угадай все, чтобы присоединиться к онлайн событию!
                                 </h3>
-                                <StyledBtn onClick={() => {
+
+                                {myScore === guessPlaces.length ? <div>Поздравляем! Вы всё угадали!</div> : <StyledBtn onClick={() => {
                                     let rr = Math.round(Math.random() * 100) % locToGuess.length
                                     let rrItem = locToGuess[rr]
                                     let rrNormIndex = guessPlaces.findIndex(el => el.name === rrItem.name)
                                     setOpenedGuessLocation(rrNormIndex)
                                     console.log(rr, rrItem, rrNormIndex, locToGuess[rr])
                                     setOpenedScreen("guessLocation")
-                                }} className="text-[red]">Угадать случайное место!</StyledBtn>
+                                }} className="text-[red]">Угадать случайное место!</StyledBtn>}
                             </Group>
                         </Panel>
                     </View>
