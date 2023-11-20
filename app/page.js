@@ -321,6 +321,7 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
     const [loaded,setLoaded] = useState(false)
     useEffect(() => {
         const func = event => {
+            console.log(event)
             // IMPORTANT: check the origin of the data!
             if(event === undefined) return
             if(event.origin === undefined) return
