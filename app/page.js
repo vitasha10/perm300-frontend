@@ -370,7 +370,7 @@ const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation
         {!loaded ? <div className="top-40 w-full text-center absolute z-10">
             Загрузка
         </div> : <></>}
-        <iframe className={"bg-[green] w-full h-screen border-none" + (loaded ? "" : " " /*opacity-0*/)} src={hhref}/>
+        <iframe className={"w-full h-screen border-none" + (loaded ? "" : " " /*opacity-0*/)} src={hhref}/>
     </div>
 }
 
@@ -396,6 +396,7 @@ const Logo = () => {
 export const useUserId = () => {
     const [vkUserId, setVkUserId] = useState(null)
     useEffect(() => {
+        if(vkUserId !== null) return
         bridge.send('VKWebAppGetUserInfo')
         .then((data) => {
             if (data.id) {
@@ -408,87 +409,7 @@ export const useUserId = () => {
     },[])
     return vkUserId === null ? "419846599" : vkUserId
 }
-export const useQuestRooms = () => {
-    const [data, setData] = useState(null)
-    const [data2, setData2] = useState(null)
-    useEffect(() => {
-        let intervalId
-        let intervalId2
-        const func2 = id => {
-            axios.get(apiUrl+"/getGuessedLocations",{
-                params: {
-                    userid: id
-                }
-            }).then(obj => {
-                if(obj.data.rows !== data) setData2(obj.data.rows)
-            }).catch(e => {
-                console.log(e)
-                alert("ошибка получения квестов")
-            })
-        }
 
-        const func = id => {
-            axios.get(apiUrl + "/getQuestRooms",{
-                params: {
-                    userid: id
-                }
-            }).then(obj => {
-                if(obj.data.rows !== data) setData(obj.data.rows)
-            }).catch(e => {
-                console.log(e)
-                alert("ошибка получения квестов")
-            })
-        }
-        //intervalId = window.setInterval(() => func("419846599"), 3000)
-        bridge.send('VKWebAppGetUserInfo').then((data) => {
-            if (data.id) {
-                intervalId = window.setInterval(() => func(data.id), 1000)
-                intervalId2 = window.setInterval(() => func2(data.id), 1000)
-            }
-        }).catch((error) => {
-            console.log("не вк",error)
-        })
-        return () => window.clearInterval(intervalId)
-    },[])
-    let final1 = data === null ? [] : data
-    let final2 = data2 === null ? [] : data2
-    return [final1,final2]
-}
-/*export const useGuessedLocations = () => {
-    const [data, setData] = useState(null)
-    useEffect(() => {
-        console.log(239203999)
-
-        let intervalId
-        const func = id => {
-            axios.get(apiUrl+"/getGuessedLocations",{
-                params: {
-                    userid: id
-                }
-            }).then(obj => {
-                if(obj.data.rows !== data) setData(obj.data.rows)
-            }).catch(e => {
-                console.log(e)
-                alert("ошибка получения квестов")
-            })
-        }
-        //intervalId = window.setInterval(() => func("419846599"), 3000)
-        console.log(bridge, 232233)
-        bridge.send('VKWebAppGetUserInfo').then((data) => {
-            console.log(2342555)
-            if (data.vk_user_id) {
-                intervalId = window.setInterval(() => func(data.id), 1000)
-            }else{
-                alert("Error")
-            }
-        }).catch((error) => {
-            console.log("не вк",error)
-        })
-        return () => window.clearInterval(intervalId)
-    },[])
-    console.log(2223,data)
-    return data === null ? [] : data
-}*/
 const App = () => {
     const [openedScreen, setOpenedScreen] = useState("main")
 
@@ -891,7 +812,7 @@ const App = () => {
                                 Угадай, где это?
                             </PanelHeader>
                             <Group>
-                                <GuessLocationPage {...{justSee: false, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
+                                {openedGuessLocation && openedScreen === "guessLocation" ? <GuessLocationPage {...{justSee: false, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
                             </Group>
                         </Panel>
                     </View>
@@ -903,7 +824,7 @@ const App = () => {
                                 Ты угадал это место
                             </PanelHeader>
                             <Group>
-                                <GuessLocationPage {...{justSee: true, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/>
+                                {openedGuessLocation && openedScreen === "guessLocationJustSee" ? <GuessLocationPage {...{justSee: true, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
                             </Group>
                         </Panel>
                     </View>

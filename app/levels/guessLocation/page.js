@@ -5,7 +5,7 @@ import {Canvas, useLoader, useThree} from "@react-three/fiber";
 import {Html, OrbitControls, useProgress} from "@react-three/drei";
 import {BackSide,TextureLoader} from "three"
 import {Suspense, useEffect, useState} from "react"
-import {guessPlaces, places} from "@/app/page";
+import {guessPlaces} from "@/app/page";
 import Image from "next/image";
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
 import {FixedLayout} from "@vkontakte/vkui";
@@ -64,6 +64,7 @@ export default function GuessLocation() {
         }
     ]
     useEffect(() => {
+        window.parent.postMessage({"type": "loaded"}, "*")
         window.closeSuccess = () => setItog(1)
         window.closeBad = () => setItog(2)
     },[])
