@@ -272,7 +272,7 @@ const PlaceMarks = ({guessed, questRooms, setOpenedScene, setOpenedGuessLocation
     </Clusterer>
 }
 
-const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen}) => {
+const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen,vkId}) => {
     const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
     useEffect(() => {
         const func = event => {
@@ -298,11 +298,11 @@ const ScenePage = ({openedScene, setOpenedScene, openedScreen, setOpenedScreen})
         }
     },[])
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
-        <iframe className={"w-full h-full border-none"} src={"https://"+timestamp+".perm300.tech/levels/"+places[openedScene].src}/>
+        <iframe className={"w-full h-full border-none"} src={"https://"+timestamp+".perm300.tech/levels/"+places[openedScene].src+"&vk_user_id="+vkId}/>
     </div>
 }
 
-const EventPage = ({eventData, setEventData, openedScreen, setOpenedScreen}) => {
+const EventPage = ({eventData, setEventData, openedScreen, setOpenedScreen,vkId}) => {
     const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
     useEffect(() => {
         const func = event => {
@@ -337,7 +337,7 @@ const EventPage = ({eventData, setEventData, openedScreen, setOpenedScreen}) => 
             <iframe className={"w-full h-full border-none"}
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    src={"https://"+timestamp+".perm300.tech"+nextEvents[eventData].href}/>
+                    src={"https://"+timestamp+".perm300.tech"+nextEvents[eventData].href+"&vk_user_id="+vkId}/>
         </div>
     </div>
 }
@@ -786,7 +786,7 @@ const App = () => {
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("map")} />}
                             />
                             <Group>
-                                <ScenePage {...{openedScene, setOpenedScene, openedScreen, setOpenedScreen}}/>
+                                <ScenePage {...{openedScene, setOpenedScene, openedScreen, setOpenedScreen,vkId}}/>
                             </Group>
                         </Panel>
                     </View>
@@ -796,7 +796,7 @@ const App = () => {
                                          before={<PanelHeaderBack onClick={() => setOpenedScreen("main")} label="Выйти" />}
                             />
                             <FixedLayout>
-                                <EventPage {...{eventData, setEventData, openedScreen, setOpenedScreen}}/>
+                                <EventPage {...{eventData, setEventData, openedScreen, setOpenedScreen,vkId}}/>
                             </FixedLayout>
                         </Panel>
                     </View>
