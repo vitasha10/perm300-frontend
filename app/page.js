@@ -24,11 +24,16 @@ import {
 import "@vkontakte/vkui/dist/cssm/styles/themes.css";
 
 import Image from "next/image";
-import {useEffect, useState} from "react";
+import {Suspense, useEffect, useState} from "react"
 import {Clusterer, Map, Placemark, YMaps} from "@pbe/react-yandex-maps";
 import {StyledBtn} from "@/components/StyledBtn";
 import {PanelHeaderBack} from "@vkontakte/vkui/src/components/PanelHeaderBack/PanelHeaderBack";
 import axios from "axios";
+
+import {Canvas, useLoader, useThree} from "@react-three/fiber";
+import {Html, OrbitControls, useProgress} from "@react-three/drei";
+import {BackSide,TextureLoader} from "three"
+import {useSearchParams} from "next/navigation";
 
 export const apiUrl = "https://api.perm300.tech"
 
@@ -179,6 +184,39 @@ export const guessPlaces = [
     },
 ]
 
+
+const PhotoSphere = ({rotation,src,setTime,justSee,setLoaded}) => {
+    const texture = useLoader(TextureLoader, src)
+    useEffect(() => {
+        if(!texture) return
+        setLoaded(true)
+        if(justSee) return
+        const func = () => {
+            setTime(prev => {
+                if(prev === 0) return 0
+                return prev - 0.5
+            })
+        }
+        const intervalId = window.setInterval(func, 500)
+        return () => window.clearInterval(intervalId)
+    },[texture,justSee])
+    return <group dispose={null}>
+        <mesh position={[0,0,0]} rotation={[0,rotation,0]}>
+            <sphereGeometry args={[256, 32, 32]} scale={[-1, 1, 1]}/>
+            <meshBasicMaterial map={texture} side={BackSide} toneMapped={false} />
+        </mesh>
+    </group>
+}
+const CameraControls = () => {
+    const { camera, gl } = useThree();
+    return <OrbitControls maxDistance={250} enablePan={false} position={[0, 0, 0]} args={[camera, gl.domElement]} />;
+}
+
+const Loader = () => {
+    const { progress } = useProgress()
+    return <Html center>{progress} % Загружено</Html>
+}
+
 export const nextEvents = [
     {
         name: "ПермьСтрой",
@@ -315,62 +353,123 @@ const MyPresentsItem = ({name, photo, onCLick}) => {
     </div>
 }
 
-const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation, setOpenedScreen}) => {
-    const vkId = useUserId()
-    const [timestamp, setTimestamp] = useState(String(Math.floor(Date.now() / 1000)))
+const GuessLocationPage = ({justSee, openedGuessLocation, setOpenedGuessLocation, setOpenedScreen,vkId}) => {
     const [loaded,setLoaded] = useState(false)
+    const data = guessPlaces[openedGuessLocation]
+    const location = "https://data.vitasha.ru/perm300/panorams/"+data.src
+    const [time, setTime] = useState(15.5)
+    const [itog, setItog] = useState(null)
+    const dots = [
+        {
+            geometry: data.geometry,
+            func: "closeSuccess",
+        },
+        {
+            geometry: guessPlaces[(openedGuessLocation + 3) % guessPlaces.length].geometry,
+            func: "closeBad",
+        },
+        {
+            geometry: guessPlaces[(openedGuessLocation + 5) % guessPlaces.length].geometry,
+            func: "closeBad",
+        }
+    ]
     useEffect(() => {
-        console.log(90825)
-        const func = event => {
-            console.log(91249,event)
-            // IMPORTANT: check the origin of the data!
-            console.log(78787, event)
-            if(event === undefined) return
-            if(event.origin === undefined) return
-            if (event.origin.indexOf("perm300.tech") !== -1) {
-                // The data was sent from your site.
-                // Data sent with postMessage is stored in event.data:
-                if(event.data?.type === "closeSuccess") {
-                    axios.post(apiUrl+"/addGuessedLocations",{
-                        userid: vkId,
-                        data: guessPlaces[openedGuessLocation].src
-                    }).then(obj => {
-                        setOpenedGuessLocation(null)
-                        setOpenedScreen("guessSuccess")
-                        console.log(obj)
-                    }).catch(e => {
-                        setOpenedGuessLocation(null)
-                        setOpenedScreen("guessSuccess")
-                        console.log(e)
-                        alert("Ошибка сохранения результата")
-                    })
-                }
-                if(event.data?.type === "closeBad") {
-                    setOpenedGuessLocation(null)
-                    setOpenedScreen("guessBad")
-                }
-                if(event.data?.type === "loaded") {
-                    setLoaded(true)
-                }
-            } else {
-                // The data was NOT sent from your site!
-                // Be careful! Do not use it. This else branch is
-                // here just for clarity, you usually shouldn't need it.
-                return
-            }
-        }
-        window.addEventListener('message', func)
-        return () => {
-            window.removeEventListener("message", func)
-        }
+        window.closeSuccess = () => setItog(1)
+        window.closeBad = () => setItog(2)
     },[])
-    let hhref = "https://"+timestamp+".perm300.tech/levels/guessLocation?id="+openedGuessLocation+(justSee ? "&justsee=true":"")
-    console.log(88908, hhref)                                                                                  
+    useEffect(() => {
+        if(itog === 1) {
+            axios.post(apiUrl+"/addGuessedLocations",{
+                userid: vkId,
+                data: guessPlaces[openedGuessLocation].src
+            }).then(obj => {
+                setOpenedGuessLocation(null)
+                setOpenedScreen("guessSuccess")
+                console.log(obj)
+            }).catch(e => {
+                setOpenedGuessLocation(null)
+                setOpenedScreen("guessSuccess")
+                console.log(e)
+                alert("Ошибка сохранения результата")
+            })
+        }
+        if(itog === 2) {
+            setOpenedGuessLocation(null)
+            setOpenedScreen("guessBad")
+        }
+    },[itog])
+
     return <div className="w-full h-[80vh] flex flex-col overflow-hidden">
         {!loaded ? <div className="top-40 w-full text-center absolute z-10">
             Загрузка
         </div> : <></>}
-        <iframe className={"w-full h-screen border-none" + (loaded ? "" : " " /*opacity-0*/)} src={hhref}/>
+        <div className="w-full h-full flex flex-col overflow-hidden bg-[#19191A]">
+            {justSee || time === 0 || time === 15.5 ? <></> : <div className="absolute z-10 top-20 left-10">
+                <h3 className="text-[red] text-[14px] font-unb text-center w-[70vw] mx-auto flex">
+                    Осталось времени: {time}
+                </h3>
+            </div>}
+            {time > 0 ? <Canvas linear className="border-none">
+                <Suspense /*fallback={<Loader/>}*/>
+                    <PhotoSphere setLoaded={setLoaded} justSee={justSee} rotation={Math.PI/2} src={location} setTime={setTime}/>
+                </Suspense>
+                <CameraControls/>
+            </Canvas> : <FixedLayout vertical={"top"}>
+                <div className="flex flex-col">
+                    <div className="flex ml-2 mb-2">
+                        <div className="rounded-[8px] bg-[#A5A5A5] pt-2 pl-2">
+                            <Image src={"/redDotIcon2.png"} width="30" height="30" alt="darkGreenDotIcon" />
+                        </div>
+                        <span className="ml-1.5 mt-2">- выбери один верный</span>
+                    </div>
+                </div>
+                <div className="flex">
+                    <YMaps query={{ lang: "ru_RU", load: "package.full", apikey: "81add0fa-3543-4b14-8d8a-60e97bcfa380" }} >
+                        <Map
+                            width={"100vw"}
+                            height={"95vh"}
+                            defaultState={{
+                                center: [58.00819, 56.21612],
+                                zoom: 12,
+                                type: "yandex#hybrid",
+                                controls: [
+                                    "zoomControl",
+
+                                ],
+                            }}
+                            defaultOptions={{
+                                suppressMapOpenBlock: true,
+                                copyrightLogoVisible: false,
+                                copyrightProvidersVisible: false,
+                                copyrightUaVisible: false,
+                            }}
+                        >
+                            <Clusterer
+                                options={{
+                                    hasHint: false,
+                                    preset: "islands#invertedRedClusterIcons",
+                                    groupByCoordinates: true,
+                                    //balloonPanelMaxMapArea: Infinity
+                                }}
+                            >
+                                {dots.map((item,i) => <Placemark key={"plcmrQsskGss"+i+String(item.geometry[0])} geometry={item.geometry}
+                                                                 properties={{
+                                                                     item: i,
+                                                                     balloonContentHeader: "Ответ - эта точка?",
+                                                                     balloonContentBody: `<button class=" text-[black] font-bold text-[14px]" onclick="window.`+item.func+`();">
+                                        Да
+                                    </button>`
+                                                                 }}
+                                                                 options={{
+                                                                     preset: "islands#redDotIcon"
+                                                                 }}
+                                />)}
+                            </Clusterer>
+                        </Map>
+                    </YMaps>
+                </div>
+            </FixedLayout>}
+        </div>
     </div>
 }
 
@@ -812,7 +911,7 @@ const App = () => {
                                 Угадай, где это?
                             </PanelHeader>
                             <Group>
-                                {openedGuessLocation && openedScreen === "guessLocation" ? <GuessLocationPage {...{justSee: false, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
+                                {openedGuessLocation && openedScreen === "guessLocation" ? <GuessLocationPage {...{justSee: false,vkId, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
                             </Group>
                         </Panel>
                     </View>
@@ -824,7 +923,7 @@ const App = () => {
                                 Ты угадал это место
                             </PanelHeader>
                             <Group>
-                                {openedGuessLocation && openedScreen === "guessLocationJustSee" ? <GuessLocationPage {...{justSee: true, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
+                                {openedGuessLocation && openedScreen === "guessLocationJustSee" ? <GuessLocationPage {...{justSee: true,vkId, setOpenedGuessLocation, setOpenedScreen, openedGuessLocation}}/> : <></>}
                             </Group>
                         </Panel>
                     </View>
