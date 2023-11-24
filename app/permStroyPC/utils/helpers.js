@@ -8,10 +8,10 @@ export const permStroyMaterials = [
     "red_wool.webp"
 ]
 
-export const permStroyMaterialsKeys = { Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5', Digit0: '0' }; //, Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0'
+export const permStroyMaterialsKeys = { Digit1: '1', Digit2: '2', Digit3: '3', Digit4: '4', Digit5: '5'}; //, Digit0: '0' }; //, Digit6: '6', Digit7: '7', Digit8: '8', Digit9: '9', Digit0: '0'
 
 export const usePlayerControls = () => {
-    const keys = { KeyW: 'forward', KeyS: 'backward', KeyA: 'left', KeyD: 'right', Space: 'jump' };
+    const keys = { KeyW: 'forward', KeyS: 'backward', KeyA: 'left', KeyD: 'right', Space: 'jump', KeyM: 'map', KeyP: "place" };
     const moveFieldByKey = (key) => keys[key];
 
     const [movement, setMovement] = useState({ forward: false, backward: false, left: false, right: false, jump: false });

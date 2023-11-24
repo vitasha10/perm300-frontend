@@ -3,7 +3,7 @@ import { io } from 'socket.io-client'
 import {useCallback, useContext, useEffect, useReducer, useState} from "react";
 import {useBox} from "@react-three/cannon";
 import {useTexture} from "@react-three/drei";
-import {permStroyMaterials} from "@/app/permStroyPC/utils/helpers";
+import {permStroyMaterials, usePlayerControls} from "@/app/permStroyPC/utils/helpers";
 import {useThree} from "@react-three/fiber";
 import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
@@ -43,11 +43,11 @@ const Cube = props => {
         set(Math.floor(e.faceIndex / 2))
     }, [])
     const onOut = useCallback(() => set(null), [])
-
-    return <mesh ref={ref} /*receiveShadow castShadow*/ onPointerMove={onMove} onPointerOut={onOut} onClick={(e) => {
+    const handleClick = e => {
         e.stopPropagation()
         const {x, y, z} = ref.current.position
-        if(curMaterial === -1) {
+        //console.log(e)
+        if(e.type === "contextmenu" || e.nativeEvent.button === 2){
             socket.emit("changeBlocks", {
                 type: "remove",
                 x,
@@ -79,7 +79,8 @@ const Cube = props => {
             ]
         })
         //addCube(...dir[Math.floor(e.faceIndex / 2)])
-    }}>
+    }
+    return <mesh ref={ref} /*receiveShadow castShadow*/ onPointerMove={onMove} onPointerOut={onOut} onClick={handleClick} onContextMenu={handleClick}>
         {[...Array(6)].map((_, index) => (
             <meshStandardMaterial attach={`material-${index}`} key={index} map={texture} color={hover === index ? "hotpink" : "white"} />
         ))}
@@ -110,7 +111,7 @@ export const Person = props => {
 
 
 export const Cubes = () => {
-    console.log('rerCubes')
+    //console.log('rerCubes')
     const [isConnected, setIsConnected] = useState(false)
 
     const [cubes, setCubes] = useState([
@@ -118,9 +119,13 @@ export const Cubes = () => {
     ])
     const [people, setPeople] = useState([])
 
+    const { map,place } = usePlayerControls();
+    if(map) {
+        console.log("map", JSON.stringify(cubes))
+    }
     useEffect(() => {
         function onConnect() {
-            console.log("connSoc")
+            //console.log("connSoc")
             setIsConnected(true)
         }
         function onDisconnect() {
@@ -131,7 +136,7 @@ export const Cubes = () => {
             setCubes(args)
         }
         const onSetPeopleServer = args => {
-            console.log("onSetPeopleServer",args)
+            //console.log("onSetPeopleServer",args)
             setPeople(args.filter(item => item.id !== socket.id))
         }
         if(socket.connected) setIsConnected(true)
@@ -146,10 +151,13 @@ export const Cubes = () => {
         }
     }, [])
     const { camera } = useThree()
+    if(place) {
+        console.log("map", camera.position)
+    }
     //console.log(232,[camera.rotation.x,camera.rotation.y,camera.rotation.z],[camera.position.x,camera.position.y,camera.position.z])
     useEffect(() => {
         if(isConnected) {
-            console.log("ffCon")
+            //console.log("ffCon")
             socket.emit("getBlocks")
             const intervalId = setInterval(() => {
                 socket.emit("getBlocks")
@@ -159,7 +167,7 @@ export const Cubes = () => {
     }, [isConnected])
     useEffect(() => {
         if(isConnected) {
-            console.log("ffConPeople")
+            //console.log("ffConPeople")
             socket.emit("getPeople")
             const intervalId = setInterval(() => {
                 socket.emit("getPeople")
@@ -169,7 +177,7 @@ export const Cubes = () => {
     }, [isConnected])
     useEffect(() => {
         if(isConnected) {
-            console.log("ffConPeopleSend")
+            //console.log("ffConPeopleSend")
             socket.emit("moveMainPerson",{
                 position: [camera.position.x,camera.position.y,camera.position.z],
                 rotation: [camera.rotation.x,camera.rotation.y,camera.rotation.z],

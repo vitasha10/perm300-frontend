@@ -5,7 +5,7 @@ import { usePlayerControls } from '../utils/helpers.js';
 import * as THREE from 'three';
 
 export const BaseCharacter = (props) => {
-    console.log('rerBaseCharacter')
+    //console.log('rerBaseCharacter')
     const direction = new THREE.Vector3();
     const frontVector = new THREE.Vector3();
     const sideVector = new THREE.Vector3();
@@ -17,12 +17,11 @@ export const BaseCharacter = (props) => {
     const [ref, api] = useSphere((index) => ({
         mass: 1,
         type: 'Dynamic',
-
-        position: [0, 10, 0],
+        position: [0, 5, 0],
         ...props,
     }));
-
     const { forward, backward, left, right, jump } = usePlayerControls();
+
     const velocity = useRef([0, 0, 0]);
     useEffect(() => api.velocity.subscribe((v) => (velocity.current = v)), []);
 
@@ -39,7 +38,7 @@ export const BaseCharacter = (props) => {
 
     return (
         <group>
-            <mesh castShadow position={props.position} ref={ref}>
+            <mesh position={props.position} ref={ref}>
                 <sphereGeometry args={props.args} />
                 <meshStandardMaterial color="#FFFF00" />
             </mesh>

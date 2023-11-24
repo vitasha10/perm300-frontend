@@ -28,6 +28,7 @@
     "socket.io-client": "^4.7.2",
     "three": "^0.158.0",
     "three-stdlib": "^2.23.13",
+    "troika-three-text": "^0.49.0",
     "zustand": "^4.4.6"
   },
   "devDependencies": {

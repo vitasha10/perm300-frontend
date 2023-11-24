@@ -17,8 +17,6 @@ export const ThreeModel = ({ ...props }) => {
             <Sparkles count={200} scale={[20, 20, 10]} size={3} speed={2} />
             <mesh
                 scale={props.scale}
-                castShadow
-                receiveShadow
                 geometry={nodes['tree-beech'].geometry}
                 material={materials.color_main}
             />
