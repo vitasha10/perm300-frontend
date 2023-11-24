@@ -1,6 +1,6 @@
 "use client";
 import {createContext, Suspense, useEffect, useState} from "react"
-import {Loader, PointerLockControls, Sky, Stage, StatsGl} from '@react-three/drei';
+import {Loader, PointerLockControls, Sky, StatsGl} from '@react-three/drei';
 import { ThreeModel } from './components/ThreeModel.jsx';
 import { BaseCharacter } from './ui/BaseCharacter.jsx';
 import {Canvas, useThree} from "@react-three/fiber";
@@ -39,28 +39,30 @@ const App = () => {
     //const screen = useVideoTexture("/medved3.mp4")
     const [video] = useState(() => {
         const vid = document.createElement("video");
-        vid.src = "/medved3.mp4";
+        vid.src = "/medved3_permStroy.mp4";//"/medved3.mp4";
         vid.crossOrigin = "Anonymous";
         vid.loop = true;
         vid.muted = true;
         vid.play();
         return vid;
     });
-    const myText = new Text()
     //myScene.add(myText)
     const {scene} = useThree()
-    myText.text = 'Добро пожаловать в\nПермьСтрой!'
-    scene.add(myText)
-    myText.anchorX = "center"
-    myText.anchorY = "middle"
-    myText.textAlign = "center"
-    myText.fontSize = 0.4
-    myText.position.x = 6.5
-    myText.position.y = 5.7
-    myText.position.z = -9.5
-    myText.color = 0xFF0000
+    /*useEffect(() => {
+        const myText = new Text()
+        myText.text = 'Добро пожаловать в\nПермьСтрой!'
+        scene.add(myText)
+        myText.anchorX = "center"
+        myText.anchorY = "middle"
+        myText.textAlign = "center"
+        myText.fontSize = 0.4
+        myText.position.x = 6.5
+        myText.position.y = 5.7
+        myText.position.z = -9.5
+        myText.color = 0xFF0000
 
-    myText.sync()
+        myText.sync()
+    },[])*/
     return <>
         <BaseCharacter controls args={[0.5]} color="yellow" />
         <mesh position={[7, 3,-10]} rotation={[0,0,0]}>
