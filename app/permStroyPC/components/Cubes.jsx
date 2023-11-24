@@ -98,8 +98,8 @@ export const Person = props => {
 
         //...props,
     }))*/
-    const texture = useTexture("/steve.png")
-    const gltf  = useLoader(GLTFLoader, '/minecraft_-_steve.glb')
+    //const texture = useTexture("/steve.png")
+    const gltf  = useLoader(GLTFLoader, '/minecraft_-_steve.glb#'+props.i)
     /*fbx.children.forEach((mesh, i) => {
         mesh.material = texture;
     });*/
@@ -137,6 +137,7 @@ export const Cubes = () => {
         }
         const onSetPeopleServer = args => {
             //console.log("onSetPeopleServer",args)
+            console.log(32323,args.filter(item => item.id !== socket.id))
             setPeople(args.filter(item => item.id !== socket.id))
         }
         if(socket.connected) setIsConnected(true)
@@ -193,7 +194,7 @@ export const Cubes = () => {
     }, [isConnected])
     permStroyMaterials.map(item => void useTexture(item))
     return <>
-        {people.map((item,i) => <Person key={"ppl"+i+"i"+item.id} {...item}/>)}
+        {people.map((item,i) => <Person key={"ppl"+i+"i"+item.id+item.position[0]+item.position[1]} {...item} i={i}/>)}
         {cubes.map((coords, index) => <Cube key={"bbcb"+coords[0]+"D"+coords[1]+"d"+coords[2]+"s"+coords[3]+"ds"+index} position={[coords[0], coords[1], coords[2]]} setCubes={setCubes} m={coords[3]}/>)}
     </>
 
