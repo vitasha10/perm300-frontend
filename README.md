@@ -79,3 +79,35 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+```
+server {
+        listen 443 ssl http2;
+        server_name m.perm300.tech prod.perm300.tech;
+
+        ssl_certificate          /root/perm300.crt;
+        ssl_certificate_key      /root/perm300.key;
+
+       location / {
+               proxy_set_header   X-Forwarded-For $remote_addr;
+               proxy_set_header   Host $http_host;
+               proxy_pass         http://127.0.0.1:3088;
+       }
+
+}
+
+server {
+        listen 443 ssl http2;
+        server_name api.perm300.tech;
+
+        ssl_certificate          /root/perm300.crt;
+        ssl_certificate_key      /root/perm300.key;
+
+       location / {
+               proxy_set_header   X-Forwarded-For $remote_addr;
+               proxy_set_header   Host $http_host;
+               proxy_pass         http://127.0.0.1:3050;
+       }
+
+}
+```
